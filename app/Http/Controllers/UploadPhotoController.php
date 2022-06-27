@@ -6,6 +6,7 @@ use App\Models\UploadsPhoto;
 use App\Http\Requests\StoreUploadPhotoRequest;
 use App\Http\Requests\UpdateUploadPhotoRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UploadPhotoController extends Controller
 {
@@ -36,29 +37,26 @@ class UploadPhotoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreUploadPhotoRequest $request)
-    {
-        //FIXME:写真が選択されずにsubmitされた時に遷移する画面へのルーティング
-        if(empty($request->file('file'))) {    
-            return redirect('no_photo_selected');
-        }
-        
-        //画像を保存する
-        // $request->file('file')->store('');
-
-        $validation = $request->validate([
+    {        
+        $request->validate([
             //TODO: 画像ファイルに対するバリデーションチェックをかける
-            'file' => ['required'],
+            'files.*.upload_photo' => 'image|mimes:jpeg,bmp,png',
         ]);
-        
-        // $file_path = Storage::putFile('/uploads_photo', $request->file('file'), 'public');
-        $upload_photo = new UploadsPhoto();
-        $upload_files = $request->file('file');  
+    
+        $upload_files = $request->file('files');  
 
-        foreach($upload_files as $file) {
-            $file_name = $request->file('file')->getClientOriginalName();
-            $file_path = $file->store('uploads_photo', 'public');
-            $upload_photo->upload_user_id = Auth::User()->user_categories_id;
-            $upload_photo->save();
+        foreach($upload_files as $index => $element) {
+            $own_email = Auth::User()->email;
+            $extension = $element['photo']->guessExtension();
+            $file_name = "{$own_email}_{$index}.{$extension}";
+            $file_path = $element['photo']->storeAs('uploads_photo', $file_name);
+
+            UploadsPhoto::create([
+                'upload_user_email' => Auth::User()->email,
+                'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+                'photo_path' => $file_path,
+                'is_seating_chart_img' => 0,
+            ]);
         }        
         
         return back();
@@ -106,6 +104,8 @@ class UploadPhotoController extends Controller
      */
     public function destroy(UploadsPhoto $upload)
     {
+        $path = $upload->photo_path;
         //TODO:画像物理削除
+        Storage::disk('uploads_photo')->delete($path);
     }
 }

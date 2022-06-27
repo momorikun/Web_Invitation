@@ -8,6 +8,7 @@ use App\Http\Controllers\UploadPhotoController;
 use App\Http\Controllers\Auth\QrCheckInController;
 use App\Models\UploadPhoto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// TODO:写真やコメントの混合を防ぐためルーティングで/{ceremonies_id}/を入れる必要がある
+// TODO:写真やコメントの混合を防ぐためルーティングで/{ceremonies_id}/を入れる必要がある⇒？？？
 
 Route::get('/', function () {
     return view('dashboard');
@@ -29,7 +30,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-Route::post('/qr_login', 'Auth\\QrLoginController@login');
+Route::post('/qr_login', 'Auth\\QrCheckInController@login');
 
 Route::group(
     [
@@ -49,9 +50,11 @@ Route::group(
         Route::post('/getGuest', 'AdminController@getSearchedGuest');
         Route::post('/updateGuest', 'AdminController@update');
         Route::get('/qr_code_reader_mode', [QrCheckInController::class, 'showQrReader'])->name('qr_code_reader_mode');
+        Route::post('/check_in', [QrCheckInController::class, 'checkIn'])->name('checkIn');
+        Route::post('/upload_wedding_info', [AdminController::class, 'upload_wedding_info'])->name('upload_wedding_info');
+        Route::post('/upload_question', [AdminController::class, 'upload_question'])->name('upload_question');
     }
 );
-// FIXME:【済】ユーザー登録時(/guestアクセス時) GuestControllerが存在しないエラーが出る
 Route::group(
     [
         'prefix' => '/guest', 

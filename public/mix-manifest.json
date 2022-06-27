@@ -4,5 +4,7 @@
     "/js/animation.js": "/js/animation.js",
     "/js/getUsersInformation.js": "/js/getUsersInformation.js",
     "/js/qrCodeReader.js": "/js/qrCodeReader.js",
+    "/js/addQuestion.js": "/js/addQuestion.js",
+    "/js/duplicateCheckCeremonyId.js": "/js/duplicateCheckCeremonyId.js",
     "/css/app.css": "/css/app.css"
 }

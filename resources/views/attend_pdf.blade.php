@@ -49,6 +49,7 @@
             <table class="table-auto text-center attend-table">
                 <thead>
                 <tr class="w-full">
+                    <th class="px-4 py-2">出席済</th>
                     <th class="px-4 py-2">名前</th>
                     <th class="px-4 py-2">メールアドレス</th>
                     <th class="px-4 py-2 money-gift">ご祝儀</th>
@@ -58,6 +59,13 @@
                 <tbody>
                 @foreach($guests as $guest)
                     <tr>
+                        <td class="border px-4 py-2">
+                            @if ($guest->is_attended)
+                                出席済み
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td class="border px-4 py-2">{{$guest->name}}</td>
                         <td class="border px-4 py-2">{{$guest->email}}</td>
                         <td class="border px-4 py-2">

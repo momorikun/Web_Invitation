@@ -17,6 +17,8 @@ mix
     .js('resources/js/animation.js', 'public/js')
     .js('resources/js/getUsersInformation.js', 'public/js')
     .js('resources/js/qrCodeReader.js', 'public/js')
+    .js('resources/js/addQuestion.js', 'public/js')
+    .js('resources/js/duplicateCheckCeremonyId.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],

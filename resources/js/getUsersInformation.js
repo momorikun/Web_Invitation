@@ -22,7 +22,6 @@ $(function(){
             return false;
         }
 
-        // FIXME: クリックイベントでCSRF対策が発火するため更新作業もajaxを用いる必要がある
         $.ajaxSetup({
             headers: {
               "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -35,7 +34,6 @@ $(function(){
             dataType: 'json',
         })
         .then(function(res){
-            console.log(res);
             let html = '';
             
             $.each(res, function(index, value){
@@ -59,31 +57,31 @@ $(function(){
                             <label for="receivedGuestName" class="label">
                                 <span class="label-text">Name</span>
                             </label>
-                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestName" name="receivedGuestName" value="${receivedName}">
+                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestName" name="receivedGuestName" placeholder="名前" value="${receivedName}">
                         </div>
                         <div class="form-control w-full max-w-xs px-1">
                             <label for="receivedGuestKana" class="label">
                                 <span class="label-text">Kana</span>
                             </label>
-                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestKana" name="receivedGuestKana" value="${receivedKana}">
+                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestKana" name="receivedGuestKana" placeholder="フリガナ" value="${receivedKana}">
                         </div>
                         <div class="form-control w-full max-w-xs px-1">
                             <label for="receivedGuestEmail" class="label">
                                 <span class="label-text">Email</span>
                             </label>
-                            <input type="email" class="input input-bordered receivedData dark:bg-white" id="receivedGuestEmail" name="receivedGuestEmail" value="${receivedEmail}" readonly>
+                            <input type="email" class="input input-bordered receivedData dark:bg-white" id="receivedGuestEmail" name="receivedGuestEmail" placeholder="メールアドレス" value="${receivedEmail}" readonly>
                         </div>
                         <div class="form-control w-full max-w-xs">
                             <label for="receivedGiftMoney" class="label">
                                 <span class="label-text">Gift Money</span>
                             </label>
-                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestGiftMoney" name="receivedGiftMoney" value="${receivedGiftMoney}">
+                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestGiftMoney" name="receivedGiftMoney" placeholder="ご祝儀金額" value="${receivedGiftMoney}">
                         </div>
                         <div class="form-control w-full max-w-xs px-1">
                             <label for="receivedGuestRemarks" class="label">
                                 <span class="label-text">Remarks</span>
                             </label>
-                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestRemarks" name="receivedGuestRemarks value="${receivedRemarks}">
+                            <input type="text" class="input input-bordered receivedData dark:bg-white" id="receivedGuestRemarks" name="receivedGuestRemarks placeholder="備考" value="${receivedRemarks}">
                         </div>
                     </div> 
                     <div class="w-full flex justify-end mt-5">
@@ -120,7 +118,6 @@ $(function(){
                     updateRemarks: updateRemarks,
                 };
                 
-                // FIXME: クリックイベントでCSRF対策が発火するため更新作業もajaxを用いる必要がある
                 $.ajaxSetup({
                     headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),

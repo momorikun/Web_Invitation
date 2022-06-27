@@ -7,11 +7,11 @@
         </x-slot>
 
         <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
-
-        <form method="POST" action="{{ route('register') }}">
+        <x-auth-validation-errors class="mb-4" :errors="$errors"/>
+        
+        <form id="registerForm" method="POST" action="{{ route('register') }}">
             @csrf
-
+            
             <!-- Name -->
             <div>
                 <x-label for="name" :value="__('名前')" />
@@ -72,3 +72,4 @@
         </form>
     </x-auth-card>
 </x-guest-layout>
+<script type="text/javascript" src="{{ mix('js/duplicateCheckCeremonyId.js') }}"></script>

@@ -13,6 +13,9 @@
                     <div class="p-6 bg-white flex justify-center">
                         <a href="/admin/attend_pdf" class="btn btn-active btn-ghos">出席者一覧を表示する</a>
                     </div>
+                    <noscript>
+                        <p class="text-red-500 underline">JavaScriptを有効にしてからご利用くださいませ。</p>
+                    </noscript>
                     <x-auth-validation-errors class="mb-4" :errors="$errors" />
                     <form id="guestSearch">
                         <label for="guestSearchInputKana" class="label">
@@ -31,9 +34,12 @@
 
                 {{-- QRコード読み取りのセクション --}}
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
-                    <h2 class="border-b border-grey-400">QRコード読み取り</h2>
+                    <h2 class="border-b border-grey-400">出席確認</h2>
+                    <noscript>
+                        <p class="text-red-500 underline">JavaScriptを有効にしてからご利用くださいませ。</p>
+                    </noscript>
                     <div class="p-6 bg-white flex justify-center">
-                        <a href="{{ route('qr_code_reader_mode') }}" class="btn btn-active btn-ghos">QRコードリーダモードにする</a>
+                        <a href="{{ route('qr_code_reader_mode') }}" class="btn btn-active btn-ghos">QRコードを読み取る</a>
                     </div>
                 </div>
 
@@ -53,14 +59,20 @@
                         <div class="p-6 bg-white flex justify-center">
                             <button type="submit" class="btn btn-active btn-ghos">招待状を送付する</button>
                         </div>
-                        {{-- //TODO:LINE URLスキーマで送付機能 URLエンコードを行う --}}
-                        {{-- //TODO:招待文は季節にあったもの、結婚式への招待か披露宴への招待かなどによって文面が異なる --}}    
                     </form>
                 </div>
 
                 {{-- 座席アップロードセクション --}}
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">座席表アップロード</h2>
+                    <form method="POST" action="#" enctype="multipart/form-data" class=" w-full">
+                        @csrf
+                            <input type="file" name="file" class="mt-5">
+                            <input type="hidden" name="upload_user_id" value="{{ Auth::User()->id }}">
+                        <div class="p-6 bg-white flex justify-center w-full">
+                            <button type="submit" class="btn btn-active btn-ghos">画像アップロード</button>
+                        </div>
+                    </form>
                 </div>
 
                 {{-- 挙式についての設定セクション --}}
@@ -76,8 +88,8 @@
                                 </ul>
                             </div>
                         @endif
-                        {{-- //TODO:action先設定 --}}
-                        <form method="POST" action="{{-- {{ route('upload_photo') }} --}}" class="block w-full">
+                        
+                        <form method="POST" action="{{ route('upload_wedding_info') }}" class="block w-full">
                             @csrf
                             <h3 class="w-full text-lg">開催日</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
@@ -131,7 +143,7 @@
                             <h3 class="w-full text-lg mt-4">会場</h3>
                             <div class="grid grid-cols-2 w-full justify-center mx-auto">
                                 {{-- //TODO: 会場の住所カラムを追加する --}}
-                                {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング --}}
+                                {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング、無理なら地図なし --}}
                                 <div class="form-control w-full max-w-xs">
                                     <label for="place_name" class="label">
                                         <span class="label-text">chapel / venue name</span>
@@ -142,7 +154,7 @@
                                     <label for="place_address" class="label">
                                         <span class="label-text">Address</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address" name="place_address">
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address" name="place_address" placeholder="住所">
                                 </div>
                             </div>                            
                             {{-- //TODO: 当日のタイムスケジュール掲載機能 --}}
@@ -151,20 +163,17 @@
                                 <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
                                 {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
                             </div>
+                            
                         </form>
                     </div>
                 </div>
 
-                {{-- アルバム掲示ブロック --}}
+                {{-- アルバム掲示セクション --}}
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">アルバム掲示</h2>
                     <div class="p-0 mt-4 bg-white">
                         @if (count($errors) > 0)
-                            <div>
-                                <div class="font-medium text-red-600">
-                                    {{ __('Whoops! Something went wrong.') }}
-                                </div>
-    
+                            <div>   
                                 <ul class="mt-3 list-disc list-inside text-sm text-red-600">
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -175,7 +184,7 @@
                         {{-- post先はname指定。resourceで自動生成される。php artisan route:listで確認 --}}
                         <form method="POST" action="{{ route('upload_photo') }}" enctype="multipart/form-data" class="xl:flex">
                             @csrf
-                            <input type="file" name="file[]" multiple>
+                            <input type="file" name="files[][photo]" multiple>
                             <input type="hidden" name="upload_user_id" value="{{ Auth::User()->id }}">
                             <div class="w-full flex justify-end mt-5">
                                 <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
@@ -197,19 +206,19 @@
                             @csrf
                             <div class="w-full py-2 pr-2 border-r-2">
                                 <p class="text-gray-400">新郎様</p>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q1forGroom" class="w-full">
                                         <span class="label-text">新婦様の第一印象は？</span>
                                     </label>
                                     <input type="text" name="Q1forGroom" id="Q1forGroom" class="input input-bordered w-full dark:bg-white">
                                 </div>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q2forGroom" class="w-full">
                                         <span class="label-text">新婦様の第一印象は？</span>
                                     </label>
                                     <input type="text" name="Q2forGroom" id="Q2forGroom" class="input input-bordered w-full dark:bg-white">
                                 </div>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q3forGroom w-full">
                                         <span class="label-text">1番の思い出は？</span>
                                     </label>
@@ -231,19 +240,19 @@
                         <form action="#" method="POST">
                             <div class="w-full py-2 pl-5">
                                 <p class="text-gray-400">新婦様</p>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q1forBride w-full">
                                         <span class="label-text">新郎様の第一印象は？</span>
                                     </label>
                                     <input type="text" name="Q1forBride" id="Q1forBride" class="input input-bordered w-full dark:bg-white">
                                 </div>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q2forBride w-full">
                                         <span class="label-text">新郎様の現在の印象は？</span>
                                     </label>
                                     <input type="text" name="Q2forBride" id="Q2forBride" class="input input-bordered w-full dark:bg-white">
                                 </div>
-                                <div class="justify-between mb-2">
+                                <div class="mb-2">
                                     <label for="Q3forBride w-full">
                                         <span class="label-text">1番の思い出は？</span>
                                     </label>
@@ -258,6 +267,7 @@
                                 <div class="flex w-full justify-end">
                                     <button type="submit" class="btn btn-active btn-ghos ">アップロード</button>
                                 </div>
+                                
                             </div>
                         </form>
                     </div>
@@ -266,17 +276,43 @@
                 {{-- 逆Q&Aセクション --}}
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">来客への質問</h2>
-                    <p class="text-gray-400">おすすめの旅行先やお店など来客に質問してみましょう</p>
+                    <p class="text-gray-400">おすすめの旅行先やお店など、ゲストの方に質問してみましょう</p>
 
-                    <form action="" method="POST" >
-
+                    <form id="questionForm">
+                        @csrf
+                        <input type="hidden" name="upload_user_email" value="{{ Auth::User()->email }}">
+                        <input type="hidden" name="upload_user_ceremony_id" value="{{ Auth::User()->ceremonies_id }}">
+                        <div id="QuestionforGuest" class="w-full">
+                            <div>
+                                <label class="w-full">
+                                    <span class="label-text">Question 1</span>
+                                </label>
+                                <input type="text" name="QforGuest" id="Q1forGuest" class="input input-bordered w-full dark:bg-white">
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-5">
+                            <button type="button" id="addQuestion" class="btn btn-active btn-ghos text-lg">+</button>
+                        </div>
+                        <div class="flex justify-end mt-5">
+                            <button id="uploadQuestionButton" type="button" class="btn btn-active btn-ghos">アップロード</button>
+                        </div>
                     </form>
+
+                    <div>
+
+                    </div>
                 </div>
+                <div class="flex w-full mt-5 justify-end pr-5">
+                    <a href="#site-top" class="btn btn-active btn-ghos">TOPに戻る</a>
+                </div>
+                
             </div>
+            
         </div>
     </div>
 </x-app-layout>
 <script type="text/javascript" src="{{ mix('js/date_selectbox.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/getUsersInformation.js') }}"></script>
+<script type="text/javascript" src="{{ mix('js/addQuestion.js') }}"></script>
 
 

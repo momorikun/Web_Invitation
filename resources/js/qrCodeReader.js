@@ -1,6 +1,8 @@
 
-const video  = $("#camera");
-const canvas = $("#canvas");
+const video  = document.querySelector("#camera");
+const canvas = document.querySelector("#canvas");
+const uuid = document.querySelector("#uuid");
+
 const ctx = canvas.getContext("2d");
 
 window.onload = () => {
@@ -17,6 +19,9 @@ window.onload = () => {
   /**
    * カメラを<video>と同期
    */
+
+  alert(navigator.mediaDevices);
+
    navigator.mediaDevices.getUserMedia(constraints)
   .then( (stream) => {
     video.srcObject = stream;
@@ -48,9 +53,36 @@ function checkPicture(){
   //----------------------
   if( code ){
     // 結果を表示
-    setQRResult("#result", code.data);  // 文字列
-    drawLine(ctx, code.location);       // 見つかった箇所に線を引く
+    let showData = setQRResult("#result", code.data);  // 文字列
+    let checkInData = escapeHTML(code.data);
 
+    uuid.setAttribute('value', checkInData);//inputタグのvalue値を更新する
+    drawLine(ctx, code.location);       // 見つかった箇所に線を引く
+    
+    $(function(){
+        $.ajaxSetup({
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+        });
+        $.ajax({
+            type: "POST",
+            url: "/admin/check_in",
+            data: {
+                checkInData: checkInData,
+            }
+        })
+        .then(function(){
+            alert('出席確認しました');
+            location.reload();
+        })
+        .fail(function(error){
+            //異常終了の際の処理
+            alert('失敗しました');
+
+        }); 
+    })
+    
     
   }
   //----------------------
@@ -73,7 +105,7 @@ function checkPicture(){
  * @param {Object} options
  * @return {void}
  */
-function drawLine(ctx, pos, options={color:"blue", size:5}){
+function drawLine(ctx, pos, options={color:"blue", size:2}){
   // 線のスタイル設定
   ctx.strokeStyle = options.color;
   ctx.lineWidth   = options.size;
@@ -96,18 +128,10 @@ function drawLine(ctx, pos, options={color:"blue", size:5}){
  * @return {void}
  */
 function setQRResult(id, data){
-  $(id).innerHTML = escapeHTML(data);
+    document.querySelector(id).innerHTML = escapeHTML(data);
 }
 
-/**
- * jQuery style wrapper
- *
- * @param {string} selector
- * @return {Object}
- */
- function $(selector){
-  return( document.querySelector(selector) );
-}
+
 
 /**
  * HTML表示用に文字列をエスケープする

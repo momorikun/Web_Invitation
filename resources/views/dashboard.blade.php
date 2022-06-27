@@ -4,7 +4,7 @@
     {{-- //TODO: 天地中央揃えでQRコード表示するページを作る --}}
     <div class="flex w-full justify-center">
         <div>
-            {{ QrCode::size(300)->generate(Auth::User()->email) }}
+            {{ QrCode::size(300)->generate(Auth::User()->uuid) }}
         </div>
     </div>
     

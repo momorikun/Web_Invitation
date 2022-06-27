@@ -5,19 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UploadsPhoto extends Model
+class Question extends Model
 {
     use HasFactory;
-
+    
     protected $fillable = [
-        'upload_user_email',
-        'upload_user_ceremony_id',
-        'photo_path',
+
     ];
     protected $hidden = [
         'id',
     ];
     protected $casts = [
-
-    ];
+        
+    ];    
 }
