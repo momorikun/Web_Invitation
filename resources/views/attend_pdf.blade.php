@@ -39,6 +39,9 @@
             .width-rem {
                 width: 3rem
             }
+            .remarks {
+                width: 25rem;
+            }
         </style>
     </head>
     <body>
@@ -49,6 +52,7 @@
                     <th class="px-4 py-2">名前</th>
                     <th class="px-4 py-2">メールアドレス</th>
                     <th class="px-4 py-2 money-gift">ご祝儀</th>
+                    <th class="px-4 py-2 remarks">備考</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -57,8 +61,16 @@
                         <td class="border px-4 py-2">{{$guest->name}}</td>
                         <td class="border px-4 py-2">{{$guest->email}}</td>
                         <td class="border px-4 py-2">
-                            {{-- //TODO:金額入力でDB登録機能（Ajax） --}}
-                            {{-- //TODO:上記noscript対応 --}}
+                            ￥
+                            @if($guest->gift_money)
+                                {{ $guest->gift_money }}
+                            @endif
+                            
+                        </td>
+                        <td class="border px-4 py-2">
+                            @if ($guest->remarks)
+                                {{ $guest->remarks }}
+                            @endif
                         </td>
                     </tr>
                 @endforeach

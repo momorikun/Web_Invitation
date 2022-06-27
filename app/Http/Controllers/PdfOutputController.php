@@ -16,9 +16,8 @@ class PdfOutputController extends Controller
         $guests = User::WHERE('user_categories_id', 2)->WHERE('plan_to_attend', 1)->orderby('kana', 'asc')->WHERE('ceremonies_id', Auth::User()->ceremonies_id)->get();
         $ceremony = Ceremony::WHERE('ceremony_admin_id', Auth::User()->id)->get();
         
-        
         $pdf = PDF::loadView('attend_pdf' , compact('admins', 'guests', 'ceremony'));
-        $pdf->setPaper('A4');
+        $pdf->setPaper('A4', 'landscape');
 
         return $pdf->stream();
     }

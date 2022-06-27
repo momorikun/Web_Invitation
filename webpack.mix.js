@@ -14,6 +14,9 @@ require('laravel-mix-workbox');
 mix
     .js('resources/js/app.js', 'public/js')
     .js('resources/js/date_selectbox.js', 'public/js')
+    .js('resources/js/animation.js', 'public/js')
+    .js('resources/js/getUsersInformation.js', 'public/js')
+    .js('resources/js/qrCodeReader.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],

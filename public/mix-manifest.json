@@ -1,5 +1,8 @@
 {
     "/js/app.js": "/js/app.js",
     "/js/date_selectbox.js": "/js/date_selectbox.js",
+    "/js/animation.js": "/js/animation.js",
+    "/js/getUsersInformation.js": "/js/getUsersInformation.js",
+    "/js/qrCodeReader.js": "/js/qrCodeReader.js",
     "/css/app.css": "/css/app.css"
 }

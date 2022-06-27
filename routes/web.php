@@ -5,7 +5,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\UploadPhotoController;
+use App\Http\Controllers\Auth\QrCheckInController;
 use App\Models\UploadPhoto;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,9 +45,13 @@ Route::group(
             return view('no_photo_selected')->name('no_photo_selected');
         });
         Route::get('/attend_pdf', 'PdfOutputController@output')->name('attend_pdf');
+        Route::post('/url_encode', 'AdminController@encode')->name('url_encode'); //LINEスキーマ用URLエンコード
+        Route::post('/getGuest', 'AdminController@getSearchedGuest');
+        Route::post('/updateGuest', 'AdminController@update');
+        Route::get('/qr_code_reader_mode', [QrCheckInController::class, 'showQrReader'])->name('qr_code_reader_mode');
     }
 );
-// FIXME:ユーザー登録時(/guestアクセス時) GuestControllerが存在しないエラーが出る
+// FIXME:【済】ユーザー登録時(/guestアクセス時) GuestControllerが存在しないエラーが出る
 Route::group(
     [
         'prefix' => '/guest', 
