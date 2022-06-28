@@ -6,5 +6,6 @@
     "/js/qrCodeReader.js": "/js/qrCodeReader.js",
     "/js/addQuestion.js": "/js/addQuestion.js",
     "/js/duplicateCheckCeremonyId.js": "/js/duplicateCheckCeremonyId.js",
+    "/js/popupImage.js": "/js/popupImage.js",
     "/css/app.css": "/css/app.css"
 }

@@ -1,0 +1,11 @@
+$(function(){
+    $('.modal_pop').hide();
+    $('.show_pop').on('click',function(){
+        $('.seating_chart').hide();
+        $('.modal_pop').fadeIn();
+    })
+    $('.js-modal-close').on('click',function(){
+        $('.seating_chart').show();
+        $('.modal_pop').fadeOut();
+    })
+})

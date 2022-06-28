@@ -19,12 +19,16 @@ mix
     .js('resources/js/qrCodeReader.js', 'public/js')
     .js('resources/js/addQuestion.js', 'public/js')
     .js('resources/js/duplicateCheckCeremonyId.js', 'public/js')
+    .js('resources/js/popupImage.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],
     })
     .postCss('resources/css/app.css', 'public/css', [
         require('tailwindcss'),
+        require('autoprefixer'),
+    ])
+    .postCss('resources/css/popupImage.css', 'public/css', [
         require('autoprefixer'),
     ]);
 // mix

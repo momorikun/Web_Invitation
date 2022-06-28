@@ -21,9 +21,10 @@ class AdminController extends Controller
     {
         //渡す情報
         $users = User::WHERE('user_categories_id', 1)->orderby('created_at', 'desc')->get();
-        $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->orderby('created_at', 'desc')->get();
+        $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 0)->orderby('created_at', 'desc')->get();
+        $seating_img = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 1)->first();
         
-        return view('admin', compact('users', 'uploads_photos'));
+        return view('admin', compact('users', 'uploads_photos', 'seating_img'));
     }
 
     /**

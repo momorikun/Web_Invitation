@@ -20,8 +20,6 @@ window.onload = () => {
    * カメラを<video>と同期
    */
 
-  alert(navigator.mediaDevices);
-
    navigator.mediaDevices.getUserMedia(constraints)
   .then( (stream) => {
     video.srcObject = stream;

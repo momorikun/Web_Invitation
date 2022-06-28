@@ -13,6 +13,7 @@ class UploadsPhoto extends Model
         'upload_user_email',
         'upload_user_ceremony_id',
         'photo_path',
+        'is_seating_chart'
     ];
     protected $hidden = [
         'id',
