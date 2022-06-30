@@ -92,7 +92,6 @@ $(function(){
         $('#ceremonies_dates_day').append('<option value="' + day_op + '">' + day_op + '</option>');
     }
 
-
     //年変更で月のSELECT BOXを変更
     
     $('#ceremonies_dates_year').on('change', function(){
@@ -131,6 +130,6 @@ $(function(){
             for (let start_day = 1; start_day <= end_day; start_day++) {
                 $('#ceremonies_dates_day').append('<option value="' + start_day + '">' + start_day + '</option>');
             }
-        }       
+        }     
     });
 });

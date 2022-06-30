@@ -7,5 +7,7 @@
     "/js/addQuestion.js": "/js/addQuestion.js",
     "/js/duplicateCheckCeremonyId.js": "/js/duplicateCheckCeremonyId.js",
     "/js/popupImage.js": "/js/popupImage.js",
-    "/css/app.css": "/css/app.css"
+    "/js/googleMapsApi.js": "/js/googleMapsApi.js",
+    "/css/app.css": "/css/app.css",
+    "/css/popupImage.css": "/css/popupImage.css"
 }

@@ -20,6 +20,7 @@ mix
     .js('resources/js/addQuestion.js', 'public/js')
     .js('resources/js/duplicateCheckCeremonyId.js', 'public/js')
     .js('resources/js/popupImage.js', 'public/js')
+    .js('resources/js/googleMapsApi.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],

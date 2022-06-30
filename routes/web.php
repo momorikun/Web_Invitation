@@ -43,9 +43,6 @@ Route::group(
         });
 
         Route::resource('/', 'AdminController')->name('index', 'admin');
-
-        //アルバム掲示関連
-        Route::resource('/upload_photo', 'UploadPhotoController')->name('store', 'upload_photo');
         
         //座席表関連
         Route::get('/upload_seating_chart', [UploadPhotoController::class, 'storeSeatingChartImg'])->name('upload_seating_chart');
@@ -68,6 +65,13 @@ Route::group(
 
         //挙式情報関連
         Route::post('/upload_wedding_info', [AdminController::class, 'upload_wedding_info'])->name('upload_wedding_info');
+
+        //アルバム掲示関連
+        Route::resource('/upload_photo', 'UploadPhotoController')->name('store', 'upload_photo');
+
+        //ふたりへの質問関連
+        Route::post('/Q_and_A_for_Groom', [AdminController::class, 'Q_and_A_for_Groom'])->name('Q_and_A_for_Groom');
+        Route::post('/Q_and_A_for_Bride', [AdminController::class, 'Q_and_A_for_Bride'])->name('Q_and_A_for_Bride');
 
         //ゲストへの質問関連
         Route::post('/upload_question', [AdminController::class, 'upload_question'])->name('upload_question');

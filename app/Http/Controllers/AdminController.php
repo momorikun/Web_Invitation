@@ -6,6 +6,13 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UploadsPhoto;
+use App\Models\Ceremony;
+use App\Models\Answer;
+use App\Http\Requests\guestInfoUpdateRequest;
+use App\Http\Requests\getSearchedGuestRequest;
+use App\Http\Requests\Question_for_Bride_Request;
+use App\Http\Requests\Question_for_Groom_Request;
+use App\Http\Requests\uploadWeddingInfoRequest;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,8 +30,9 @@ class AdminController extends Controller
         $users = User::WHERE('user_categories_id', 1)->orderby('created_at', 'desc')->get();
         $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 0)->orderby('created_at', 'desc')->get();
         $seating_img = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 1)->first();
-        
-        return view('admin', compact('users', 'uploads_photos', 'seating_img'));
+        $ceremony_info = Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->first();
+
+        return view('admin', compact('users', 'uploads_photos', 'seating_img', 'ceremony_info'));
     }
 
     /**
@@ -76,17 +84,8 @@ class AdminController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(guestInfoUpdateRequest $request)
     {
-        $request->validate([
-            'updateId'        => ['required', 'string', 'min:8', 'max:50'],
-            'updateName'      => ['required', 'string', 'max:255'],
-            'updateKana'      => ['required', 'string', 'min:2', 'max:255'],
-            'updateEmail'     => ['required', 'string', 'email', 'max:255'],
-            'updateGiftMoney' => ['integer', 'nullable'],
-            'updateRemarks'   => ['string', 'max:30', 'nullable'],
-        ]);
-        
         $updateData = $request->only([
             'updateName',
             'updateKana',
@@ -136,33 +135,132 @@ class AdminController extends Controller
     }
 
 
-    public function getSearchedGuest(Request $request){
-        $request->validate([
-            'id'   => ['required', 'string', 'min:8', 'max:50'],
-            'kana' => ['required', 'string', 'min:2', 'max:255'],
-        ]);
-        
+    public function getSearchedGuest(getSearchedGuestRequest $request){
         $data = $request->only(['id', 'kana']);
         $guests = User::WHERE('kana', $data['kana'])->WHERE('ceremonies_id', $data['id'])->get();
         
         return response()->json($guests);
     }
 
-    public function upload_wedding_info(Request $request){
-        $request->validate([
-            'ceremonies_dates_year' => ['required', 'date'],
-            'ceremonies_dates_month'=> ['required', 'date'],
-            'ceremonies_dates_day'  => ['required', 'date'],
-            'ceremonies_dates_time' => ['required', 'time'],
-            'place_name'   => ['required', 'string'],
-            'place_address'=> ['required', 'string'],
+    /**
+     * 挙式情報掲載
+     *
+     * @param uploadWeddingInfoRequest $request
+     * @return void
+     */
+    public function upload_wedding_info(uploadWeddingInfoRequest $request){
+        $data = $request->only([
+            'upload_user_ceremony_id',
+            'ceremonies_dates_year',
+            'ceremonies_dates_month',
+            'ceremonies_dates_day',
+            'ceremonies_dates_time',
+            'place_name',
+            'place_state',
+            'place_city',
+            'place_address_line',
         ]);
+        $address_elem = $request->only(['place_state', 'place_city', 'place_address_line']);
+        $address = implode($address_elem);
+        
+        $date_elem = $request->only(['ceremonies_dates_year', 'ceremonies_dates_month', 'ceremonies_dates_day']);
+        $time = $data['ceremonies_dates_time'];
+        $date_str = implode("-", $date_elem)." ".$time;
 
-        // TODO: バリデーションのルール見直し
+        $exist = Ceremony::WHERE('ceremony_id', $data['upload_user_ceremony_id'])->get();
+
+        if(count($exist) > 0) {
+            Ceremony::WHERE('ceremony_id', $data['upload_user_ceremony_id'])->update([
+                'place_name' => $data['place_name'],
+                'address' => $address,
+                'date_and_time' => $date_str,
+            ]);
+        } else {
+            Ceremony::create([
+                'ceremony_id'  => $data['upload_user_ceremony_id'],
+                'place_name'   => $data['place_name'],
+                'address'      => $address,
+                'date_and_time'=> $date_str,
+            ]);
+        }
+        
+        return back();
+        // return view('test', compact('dates'));
         // TODO: ジオコーディングAPIに住所を投げる　https://map.yahooapis.jp/geocode/V1/geoCoder?appid=<あなたのアプリケーションID>&query=%e6%9d%b1%e4%ba%ac%e9%83%bd%e6%b8%af%e5%8c%ba%e5%85%ad%e6%9c%ac%e6%9c%a8
-        // TODO: DBへの登録
     }
 
+    public function Q_and_A_for_Groom(Question_for_Groom_Request $request){
+        $data = $request->only([
+            'Q1forGroom',
+            'Q2forGroom',
+            'Q3forGroom',
+            'Q4forGroom',
+        ]);
+
+        $exist = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+        ->WHERE('is_bride', 0)
+        ->get();
+
+        if(count($exist) > 0){
+            foreach($data as $item){
+                Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+                ->WHERE('is_bride', 0)
+                ->update([
+                    'answer_body' => $item['Q1forGroom'],
+                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+                ]);
+            }
+        } else {
+            foreach($data as $item){
+                Answer::create([
+                    'is_bride' => 0,
+                    'answer_body' => $item,
+                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+                ]);
+            }
+        }
+        return back();
+        
+    }
+
+    public function Q_and_A_for_Bride(Question_for_Bride_Request $request){
+        $data = $request->only([
+            'Q1forBride',
+            'Q2forBride',
+            'Q3forBride',
+            'Q4forBride',
+        ]);
+
+        $exist = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+        ->WHERE('is_bride', 1)
+        ->get();
+
+        if(count($exist) > 0){
+            foreach($data as $item){
+                Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+                ->WHERE('is_bride', 1)
+                ->update([
+                    'answer_body' => $item,
+                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+                ]);
+            }
+        } else {
+            foreach($data as $item){
+                Answer::create([
+                    'is_bride' => 1,
+                    'answer_body' => $item,
+                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+                ]);
+            }
+        } 
+        return back();
+    }
+    /**
+     * ゲストへの質問
+     *
+     * @param Request $request
+     * @return void
+     */
     public function upload_question(Request $request){
         $request->validate([
            'upload_user_email' => ['required', 'string', 'email'],
@@ -177,4 +275,6 @@ class AdminController extends Controller
             'question_body' => $data['QforGuest']
         ]);
     }
+
+    
 }

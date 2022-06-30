@@ -16,7 +16,7 @@
                     <noscript>
                         <p class="text-red-500 underline">JavaScriptを有効にしてからご利用くださいませ。</p>
                     </noscript>
-                    <x-auth-validation-errors class="mb-4" :errors="$errors" />
+                    <x-auth-validation-errors class="mb-4" :errors="$errors->guestInfoUpdate" />
                     <form id="guestSearch">
                         <label for="guestSearchInputKana" class="label">
                             <span class="label-text">ゲスト名</span>
@@ -104,18 +104,26 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">挙式についての詳細設定</h2>
                     <div class="p-0 mt-4 bg-white">
-                        @if (count($errors) > 0)
+                        @if (count($errors->uploadWeddingInfo) > 0)
                             <div>           
                                 <ul class="mt-3 list-disc list-inside text-sm text-red-600">
-                                    @foreach ($errors->all() as $error)
+                                    @foreach ($errors->uploadWeddingInfo->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
                                 </ul>
                             </div>
                         @endif
+                        @if ($ceremony_info)
+                        <input type="hidden" id="venue_address" value="{{ $ceremony_info->address }}">
+                        @else
+                        <input type="hidden" id="venue_address" value="">
+                        @endif
                         
                         <form method="POST" action="{{ route('upload_wedding_info') }}" class="block w-full">
                             @csrf
+                            
+                            <input type="hidden" name="upload_user_ceremony_id" value="{{ Auth::User()->ceremonies_id }}">
+
                             <h3 class="w-full text-lg">開催日</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
                                 <div class="form-control w-full max-w-xs">
@@ -123,12 +131,12 @@
                                         <span class="label-text">year</span>
                                     </label>
                                     <select class="select select-bordered dark:bg-white" id="ceremonies_dates_year" name="ceremonies_dates_year">
-                                        <noscript>
+                                        {{-- <noscript>
                                         @for ($birth_year = idate('Y'); $birth_year <= idate('Y')+10; ++$birth_year){
                                             <option value="{{ $birth_year }}">{{ $birth_year }}</option>
                                         } 
                                         @endfor
-                                        </noscript>
+                                        </noscript> --}}
                                     </select>    
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
@@ -136,12 +144,12 @@
                                         <span class="label-text">month</span>
                                     </label>
                                     <select class="select select-bordered dark:bg-white" id="ceremonies_dates_month" name="ceremonies_dates_month">
-                                        <noscript>
+                                        {{-- <noscript>
                                         @for ($birth_month = 1; $birth_month <= 12; ++$birth_month){
                                             <option value="{{ $birth_month }}">{{ $birth_month }}</option>
                                         }   
                                         @endfor
-                                        </noscript>
+                                        </noscript> --}}
                                     </select>
                                 </div>
                                 <div class="form-control w-full max-w-xs">
@@ -149,12 +157,12 @@
                                         <span class="label-text">day</span>
                                     </label>
                                     <select class="select select-bordered dark:bg-white" id="ceremonies_dates_day" name="ceremonies_dates_day">
-                                        <noscript>
+                                        {{-- <noscript>
                                         @for ($birth_day = 1; $birth_day <= 31; ++$birth_day){
                                                 <option value="{{ $birth_day }}">{{ $birth_day }}</option>
                                         }   
                                         @endfor
-                                        </noscript>
+                                        </noscript> --}}
                                     </select>
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
@@ -166,7 +174,7 @@
                             </div>
                             
                             <h3 class="w-full text-lg mt-4">会場</h3>
-                            <div class="grid grid-cols-2 w-full justify-center mx-auto">
+                            <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
                                 {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング、無理なら地図なし --}}
                                 <div class="form-control w-full max-w-xs">
                                     <label for="place_name" class="label">
@@ -175,19 +183,55 @@
                                     <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名">
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
-                                    <label for="place_address" class="label">
-                                        <span class="label-text">Address</span>
+                                    <label for="place_state" class="label">
+                                        <span class="label-text">state</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address" name="place_address" placeholder="住所">
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_state" name="place_state" placeholder="都道府県">
                                 </div>
+                                <div class="form-control w-full max-w-xs">
+                                    <label for="place_city" class="label">
+                                        <span class="label-text">city</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_city" name="place_city" placeholder="市">
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_address_line" class="label">
+                                        <span class="label-text">Address Line</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address_line" name="place_address_line" placeholder="区町村・番地・号">
+                                </div>                                
+                            </div>
+                            <h3 class="w-full text-lg mt-4">現在設定</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
+                                {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング、無理なら地図なし --}}
+                                <div class="form-control w-full max-w-xs">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">日時</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名" value="{{ $ceremony_info->date_and_time }}"  disabled>
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">会場</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名" value="{{ $ceremony_info->place_name }}"  disabled>
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_state" class="label">
+                                        <span class="label-text">住所</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_state" name="place_state" placeholder="都道府県" value="{{ $ceremony_info->address }}" disabled>
+                                </div>                             
                             </div>
                             <div class="flex w-full justify-center">
-                                <div id="map" class="w-1/2 h-96 mt-5 bg-slate-500">
+                                @if ($ceremony_info)
+                                <div id="map" class="w-full md:w-1/2 h-96 mt-16 bg-slate-500">
                                     
-                                </div>                            
+                                </div>                                
+                                @endif
+                                
                             </div>
-                            {{-- //TODO: 当日のタイムスケジュール掲載機能 --}}
-                            <input type="hidden" name="upload_user_id" value="{{ Auth::User()->email }}">
+                            
                             <div class="w-full flex justify-end mt-5">
                                 <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
                                 {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
@@ -236,7 +280,7 @@
                     <p class="text-gray-400">※この回答は来客へ開示されます</p>
                     <div class="grid grid-cols-2 mt-5">
                         {{-- //TODO:新郎Q&A Controller --}}
-                        <form action="#" method="POST" class="w-full ">
+                        <form action="{{ route('Q_and_A_for_Groom') }}" method="POST" class="w-full ">
                             @csrf
                             <div class="w-full py-2 pr-2 border-r-2">
                                 <p class="text-gray-400">新郎様</p>
@@ -248,7 +292,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q2forGroom" class="w-full">
-                                        <span class="label-text">新婦様の第一印象は？</span>
+                                        <span class="label-text">新婦様の現在の印象は？</span>
                                     </label>
                                     <input type="text" name="Q2forGroom" id="Q2forGroom" class="input input-bordered w-full dark:bg-white">
                                 </div>
@@ -271,7 +315,8 @@
                         </form>
 
                         {{-- //TODO:新婦Q&A Controller --}}
-                        <form action="#" method="POST">
+                        <form action="{{ route('Q_and_A_for_Bride') }}" method="POST">
+                            @csrf
                             <div class="w-full py-2 pl-5">
                                 <p class="text-gray-400">新婦様</p>
                                 <div class="mb-2">
@@ -348,5 +393,7 @@
 <script type="text/javascript" src="{{ mix('js/date_selectbox.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/getUsersInformation.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/addQuestion.js') }}"></script>
+<script src="//maps.googleapis.com/maps/api/js?key={{ env('MIX_GOOGLE_MAPS_API_KEY') }}"></script>
+<script type="text/javascript" src="{{ mix('js/googleMapsApi.js') }}"></script>
 
 

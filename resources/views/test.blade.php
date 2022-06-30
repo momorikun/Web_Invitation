@@ -8,7 +8,13 @@
             {{-- @dd($exist) --}}
             {{-- @dd($request) --}}
             {{-- @dd($old_photo) --}}
-            @dd($request)
+            {{-- @dd($request) --}}
+            {{-- @dd($address); --}}
+            {{-- @php
+                
+            @endphp
+            @dd(gettype($date)) --}}
+            @dd($item)
         </div>
     </div>
 </x-app-layout>
