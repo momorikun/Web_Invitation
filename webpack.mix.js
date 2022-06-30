@@ -21,6 +21,7 @@ mix
     .js('resources/js/duplicateCheckCeremonyId.js', 'public/js')
     .js('resources/js/popupImage.js', 'public/js')
     .js('resources/js/googleMapsApi.js', 'public/js')
+    .js('resources/js/deletePhotosInAlbumPage.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],

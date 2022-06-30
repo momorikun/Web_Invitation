@@ -81,7 +81,7 @@
                     @if ($seating_img)
                     
                     <div class="flex w-full justify-center">
-                        <img src="{{ asset('storage/'.$seating_img->photo_path) }}" alt="座席表は主催者までご確認ください" class="object-cover show_pop cursor-pointer seating_chart">
+                        <img src="{{ asset('storage/'.$seating_img->photo_path) }}" alt="座席表は主催者までご確認ください" class="object-cover show_pop cursor-pointer">
                         <div class="modal_pop hidden w-screen h-screen position-fixed top-0 left-0 z-30">
                             <div class="bg js-modal-close bg-slate-500 w-full h-full position-fixed z-40"></div>
                             <div class="modal_pop_main">
@@ -255,12 +255,13 @@
                             </div>
                         @endif
                         {{-- post先はname指定。resourceで自動生成される。php artisan route:listで確認 --}}
-                        <form method="POST" action="{{ route('upload_photo') }}" enctype="multipart/form-data" class="xl:flex">
+                        <form method="POST" action="{{ route('upload_photo') }}" enctype="multipart/form-data" class="block">
                             @csrf
                             <input type="file" name="files[][photo]" multiple>
                             <input type="hidden" name="upload_user_id" value="{{ Auth::User()->id }}">
-                            <div class="w-full flex justify-end mt-5">
-                                <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
+                            <div class="p-6 bg-white flex justify-center w-full">
+                                <button type="submit" class="btn btn-active btn-ghos mr-1">アップロード</button>
+                                <a href="{{ route('album_page') }}" class="btn btn-outline ml-1">写真一覧へ</a>
                                 {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
                             </div>
                         </form>
@@ -268,9 +269,7 @@
                         {{-- //TODO:画像表示(3列*n行) 画像にRemoveのリンク --}}
                         {{-- //TODO:画像アップロードがなければないことを表す文を表示 --}}
                         {{-- //TODO:colorboxの適応（imgタグをaタグで囲む） --}}
-                        <div class="p-6 bg-white flex justify-center w-full">
-                            <a href="#" class="btn btn-active btn-ghos">写真一覧へ</a>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -357,23 +356,21 @@
                     <h2 class="border-b border-grey-400">来客への質問</h2>
                     <p class="text-gray-400">おすすめの旅行先やお店など、ゲストの方に質問してみましょう</p>
 
-                    <form id="questionForm">
+                    <form id="questionForm" action="{{ route('QuestionForGuest') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="upload_user_email" value="{{ Auth::User()->email }}">
-                        <input type="hidden" name="upload_user_ceremony_id" value="{{ Auth::User()->ceremonies_id }}">
                         <div id="QuestionforGuest" class="w-full">
                             <div>
                                 <label class="w-full">
                                     <span class="label-text">Question 1</span>
                                 </label>
-                                <input type="text" name="QforGuest" id="Q1forGuest" class="input input-bordered w-full dark:bg-white">
+                                <input type="text" name="Q1forGuest" id="Q1forGuest" class="input input-bordered w-full dark:bg-white">
                             </div>
                         </div>
                         <div class="flex justify-end mt-5">
                             <button type="button" id="addQuestion" class="btn btn-active btn-ghos text-lg">+</button>
                         </div>
                         <div class="flex justify-end mt-5">
-                            <button id="uploadQuestionButton" type="button" class="btn btn-active btn-ghos">アップロード</button>
+                            <button id="uploadQuestionButton" type="submit" class="btn btn-active btn-ghos">アップロード</button>
                         </div>
                     </form>
 
@@ -393,7 +390,7 @@
 <script type="text/javascript" src="{{ mix('js/date_selectbox.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/getUsersInformation.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/addQuestion.js') }}"></script>
-<script src="//maps.googleapis.com/maps/api/js?key={{ env('MIX_GOOGLE_MAPS_API_KEY') }}"></script>
+<script async defer src="//maps.googleapis.com/maps/api/js?key={{ env('MIX_GOOGLE_MAPS_API_KEY') }}"></script>
 <script type="text/javascript" src="{{ mix('js/googleMapsApi.js') }}"></script>
 
 

@@ -68,13 +68,14 @@ Route::group(
 
         //アルバム掲示関連
         Route::resource('/upload_photo', 'UploadPhotoController')->name('store', 'upload_photo');
+        
 
         //ふたりへの質問関連
         Route::post('/Q_and_A_for_Groom', [AdminController::class, 'Q_and_A_for_Groom'])->name('Q_and_A_for_Groom');
         Route::post('/Q_and_A_for_Bride', [AdminController::class, 'Q_and_A_for_Bride'])->name('Q_and_A_for_Bride');
 
         //ゲストへの質問関連
-        Route::post('/upload_question', [AdminController::class, 'upload_question'])->name('upload_question');
+        Route::post('/QuestionForGuest', [AdminController::class, 'QuestionForGuest'])->name('QuestionForGuest');
     }
 );
 Route::group(
@@ -85,6 +86,9 @@ Route::group(
         Route::get('/', function(){
             return view('dashboard');
         })->middleware(['auth'])->name('dashboard');
+
+        //アルバム掲示関係
+        Route::get('/album_page', [UploadPhotoController::class, 'index'])->name('album_page');
     }
 );
 

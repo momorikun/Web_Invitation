@@ -1,11 +1,19 @@
 $(function(){
     $('.modal_pop').hide();
-    $('.show_pop').on('click',function(){
-        $('.seating_chart').hide();
-        $('.modal_pop').fadeIn();
+
+    $('.show_pop').each(function(){
+        $(this).on('click',function(){
+            $(this).next('.modal_pop').fadeIn();
+        })
+    });
+    $('.js-modal-close').each(function(){
+        $(this).on('click',function(){
+            $(this).parent().fadeOut();
+        })
     })
-    $('.js-modal-close').on('click',function(){
-        $('.seating_chart').show();
-        $('.modal_pop').fadeOut();
+    $('.js-modal-close-img').each(function(){
+        $(this).on('click',function(){
+            $(this).parent().parent().fadeOut();
+        })
     })
 })

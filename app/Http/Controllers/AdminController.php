@@ -12,6 +12,7 @@ use App\Http\Requests\guestInfoUpdateRequest;
 use App\Http\Requests\getSearchedGuestRequest;
 use App\Http\Requests\Question_for_Bride_Request;
 use App\Http\Requests\Question_for_Groom_Request;
+use App\Http\Requests\QuestionForGuestRequest;
 use App\Http\Requests\uploadWeddingInfoRequest;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ class AdminController extends Controller
         //渡す情報
         $users = User::WHERE('user_categories_id', 1)->orderby('created_at', 'desc')->get();
         $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 0)->orderby('created_at', 'desc')->get();
-        $seating_img = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 1)->first();
+        $seating_img = UploadsPhoto::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('is_seating_chart', 1)->first();
         $ceremony_info = Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->first();
 
         return view('admin', compact('users', 'uploads_photos', 'seating_img', 'ceremony_info'));
@@ -189,6 +190,12 @@ class AdminController extends Controller
         // TODO: ジオコーディングAPIに住所を投げる　https://map.yahooapis.jp/geocode/V1/geoCoder?appid=<あなたのアプリケーションID>&query=%e6%9d%b1%e4%ba%ac%e9%83%bd%e6%b8%af%e5%8c%ba%e5%85%ad%e6%9c%ac%e6%9c%a8
     }
 
+    /**
+     * 新郎の答え
+     *
+     * @param Question_for_Groom_Request $request
+     * @return void
+     */
     public function Q_and_A_for_Groom(Question_for_Groom_Request $request){
         $data = $request->only([
             'Q1forGroom',
@@ -198,13 +205,13 @@ class AdminController extends Controller
         ]);
 
         $exist = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-        ->WHERE('is_bride', 0)
+        ->WHERE('upload_user_type', 0)
         ->get();
 
         if(count($exist) > 0){
             foreach($data as $item){
                 Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-                ->WHERE('is_bride', 0)
+                ->WHERE('upload_user_type', 0)
                 ->update([
                     'answer_body' => $item['Q1forGroom'],
                     'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
@@ -213,7 +220,7 @@ class AdminController extends Controller
         } else {
             foreach($data as $item){
                 Answer::create([
-                    'is_bride' => 0,
+                    'upload_user_type' => 0,
                     'answer_body' => $item,
                     'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
                 ]);
@@ -222,7 +229,12 @@ class AdminController extends Controller
         return back();
         
     }
-
+    /**
+     * 新婦の答え
+     *
+     * @param Question_for_Bride_Request $request
+     * @return void
+     */
     public function Q_and_A_for_Bride(Question_for_Bride_Request $request){
         $data = $request->only([
             'Q1forBride',
@@ -232,13 +244,13 @@ class AdminController extends Controller
         ]);
 
         $exist = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-        ->WHERE('is_bride', 1)
+        ->WHERE('upload_user_type', 1)
         ->get();
 
         if(count($exist) > 0){
             foreach($data as $item){
                 Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-                ->WHERE('is_bride', 1)
+                ->WHERE('upload_user_type', 1)
                 ->update([
                     'answer_body' => $item,
                     'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
@@ -247,7 +259,7 @@ class AdminController extends Controller
         } else {
             foreach($data as $item){
                 Answer::create([
-                    'is_bride' => 1,
+                    'upload_user_type' => 1,
                     'answer_body' => $item,
                     'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
                 ]);
@@ -258,23 +270,26 @@ class AdminController extends Controller
     /**
      * ゲストへの質問
      *
-     * @param Request $request
+     * @param QuestionForGuestRequest $request
      * @return void
      */
-    public function upload_question(Request $request){
-        $request->validate([
-           'upload_user_email' => ['required', 'string', 'email'],
-           'upload_user_ceremony_id' => ['required', 'string'],
-           'QforGuest' => ['string', 'max:50'], 
-        ]);
-
-        $data = $request->only(['upload_user_email', 'QforGuest']);
-        
-        Question::create([
-            'upload_user_email' => $data['upload_user_email'],
-            'question_body' => $data['QforGuest']
-        ]);
-    }
-
     
+    public function QuestionForGuest(QuestionForGuestRequest $request){
+        $data = $request->only([
+            'Q1forGuest',
+            'Q2forGuest',
+            'Q3forGuest',
+            'Q4forGuest',
+            'Q5forGuest',
+        ]);
+
+        foreach($data as $item){
+            Question::create([
+                'upload_user_email' => Auth::User()->email,
+                'question_body' => $item,
+                'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+            ]);
+        }
+        return back();
+    }
 }

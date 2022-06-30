@@ -5,7 +5,7 @@ $(function(){
   function initMap(lat, lng) {
     let latlng = new google.maps.LatLng( lat, lng );//中心の緯度, 経度
     let map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 14,//ズームの調整
+      zoom: 16,//ズームの調整
       center: latlng//上で設定した中心
     });
     let marker = new google.maps.Marker({

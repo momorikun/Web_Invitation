@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUploadPhotoRequest;
 use App\Http\Requests\UpdateUploadPhotoRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 
 class UploadPhotoController extends Controller
@@ -18,7 +19,11 @@ class UploadPhotoController extends Controller
      */
     public function index()
     {
-        //
+        //渡す情報
+        $photos = UploadsPhoto::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+                  ->WHERE('is_seating_chart', 0)->paginate(12);
+
+        return view('albums_page', compact('photos'));
     }
 
     /**
@@ -46,16 +51,17 @@ class UploadPhotoController extends Controller
         $upload_files = $request->file('files');  
 
         foreach($upload_files as $index => $element) {
+            $date = date("YmdHis");
             $own_ceremony_id = Auth::User()->ceremonies_id;
             $extension = $element['photo']->guessExtension();
-            $file_name = "{$own_ceremony_id}_{$index}.{$extension}";
+            $file_name = "{$own_ceremony_id}_{$date}_{$index}.{$extension}";
             $file_path = $element['photo']->storeAs('uploads_photo', $file_name);
 
             UploadsPhoto::create([
                 'upload_user_email' => Auth::User()->email,
                 'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
                 'photo_path' => $file_path,
-                'is_seating_chart_img' => 0,
+                'is_seating_chart' => 0,
             ]);
         }        
         
@@ -159,6 +165,12 @@ class UploadPhotoController extends Controller
         return back();
     }
 
+    /**
+     * 座席表の削除
+     *
+     * @param Request $request
+     * @return void
+     */
      public function deleteSeatingChart(Request $request){
         $target_photo = UploadsPhoto::WHERE('upload_user_ceremony_id', $request->upload_user_ceremony_id)
             ->WHERE('is_seating_chart', 1)->first();
