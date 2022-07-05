@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'ceremonies_id',
+        'is_answered',
         'user_categories_id',
         'uuid',
     ];

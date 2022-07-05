@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+
 class QuestionForGuestRequest extends FormRequest
 {
     /**
@@ -25,10 +26,10 @@ class QuestionForGuestRequest extends FormRequest
     {
         return [
             'Q1forGuest' => ['required', 'string'],
-            'Q2forGuest' => ['required', 'string'],
-            'Q3forGuest' => ['required', 'string'],
-            'Q4forGuest' => ['required', 'string'],
-            'Q5forGuest' => ['required', 'string'],
+            'Q2forGuest' => ['string', 'nullable'],
+            'Q3forGuest' => ['string', 'nullable'],
+            'Q4forGuest' => ['string', 'nullable'],
+            'Q5forGuest' => ['string', 'nullable'],
         ];
     }
 }

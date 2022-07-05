@@ -1,3 +1,4 @@
+@section('title', '| 主催者')
 <x-app-layout>
     <x-slot name="header" >
         
@@ -25,11 +26,6 @@
                         <input type="hidden" id="guestSearchCeremonyId" value="{{ Auth::User()->ceremonies_id }}">
                         <button type="button" id="guestSearchButton" class="btn btn-active btn-ghos">ゲスト検索</button>
                     </form>
-                    
-                        {{-- //TODO: DBから引っ張ったゲスト情報を表示するフォームを作る --}}
-                        {{-- //TODO: 名前・カナ・メールアドレス・ご祝儀金額・備考欄 --}}
-                        
-                    
                 </div>
 
                 {{-- QRコード読み取りのセクション --}}
@@ -44,7 +40,7 @@
                 </div>
 
                 {{-- 招待状送付のセクション --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
+                <div id="invitation" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">招待状送付</h2>
                     <p class="text-gray-400">※PC版LINEでは動作しません。</p>
                     <p class="text-gray-400">送付はスマートフォンから行ってください。 </p>
@@ -63,13 +59,22 @@
                 </div>
 
                 {{-- 座席アップロードセクション --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
+                <div id="seating-chart" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">座席表アップロード</h2>
                     @if(session()->has('message'))
                         <div class="mt-3 list-disc list-inside text-sm text-red-600">
                             {{session('message')}}
                         </div>
                     @endif
+                    @if (count($errors->storeSeatingChartImg) > 0)
+                            <div>           
+                                <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                                    @foreach ($errors->storeSeatingChartImg->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     <form method="POST" action="{{ route('upload_seating_chart') }}" enctype="multipart/form-data" class=" w-full">
                         @csrf
                             <input type="file" name="file" class="mt-5">
@@ -101,7 +106,7 @@
                 </div>
 
                 {{-- 挙式についての設定セクション --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
+                <div id="ceremony-info" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">挙式についての詳細設定</h2>
                     <div class="p-0 mt-4 bg-white">
                         @if (count($errors->uploadWeddingInfo) > 0)
@@ -121,108 +126,150 @@
                         
                         <form method="POST" action="{{ route('upload_wedding_info') }}" class="block w-full">
                             @csrf
-                            
-                            <input type="hidden" name="upload_user_ceremony_id" value="{{ Auth::User()->ceremonies_id }}">
+                            <h3 class="w-full text-lg">お名前</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
+                                <div class="form_control w-full max-w-xs px-1">
+                                    <label for="groom_name" class="label">
+                                        <span class="label-text">新郎 お名前</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white w-full" id="groom_name" name="groom_name" value="{{ old('groom_name') }}">
+                                </div>
+                                <div class="form_control w-full max-w-xs px-1">
+                                    <label for="bride_name" class="label">
+                                        <span class="label-text">新婦 お名前</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white w-full" id="bride_name" name="bride_name" value="{{ old('bride_name') }}">
+                                </div>
+                            </div>
 
-                            <h3 class="w-full text-lg">開催日</h3>
+                            <h3 class="w-full text-lg mt-4">開催日</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
                                 <div class="form-control w-full max-w-xs">
                                     <label for="ceremonies_dates_year" class="label">
-                                        <span class="label-text">year</span>
+                                        <span class="label-text">年</span>
                                     </label>
-                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_year" name="ceremonies_dates_year">
-                                        {{-- <noscript>
-                                        @for ($birth_year = idate('Y'); $birth_year <= idate('Y')+10; ++$birth_year){
-                                            <option value="{{ $birth_year }}">{{ $birth_year }}</option>
-                                        } 
-                                        @endfor
-                                        </noscript> --}}
+                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_year" name="ceremonies_dates_year" value="{{ old('ceremonies_dates_year') }}">
+                                        {{-- date_selectbox.jsにて管理 --}}
                                     </select>    
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
                                     <label for="ceremonies_dates_month" class="label">
-                                        <span class="label-text">month</span>
+                                        <span class="label-text">月</span>
                                     </label>
-                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_month" name="ceremonies_dates_month">
-                                        {{-- <noscript>
-                                        @for ($birth_month = 1; $birth_month <= 12; ++$birth_month){
-                                            <option value="{{ $birth_month }}">{{ $birth_month }}</option>
-                                        }   
-                                        @endfor
-                                        </noscript> --}}
+                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_month" name="ceremonies_dates_month" value="{{ old('ceremonies_dates_month') }}">
+                                        {{-- date_selectbox.jsにて管理 --}}
                                     </select>
                                 </div>
                                 <div class="form-control w-full max-w-xs">
                                     <label for="ceremonies_dates_day" class="label">
-                                        <span class="label-text">day</span>
+                                        <span class="label-text">日</span>
                                     </label>
-                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_day" name="ceremonies_dates_day">
-                                        {{-- <noscript>
-                                        @for ($birth_day = 1; $birth_day <= 31; ++$birth_day){
-                                                <option value="{{ $birth_day }}">{{ $birth_day }}</option>
-                                        }   
-                                        @endfor
-                                        </noscript> --}}
+                                    <select class="select select-bordered dark:bg-white" id="ceremonies_dates_day" name="ceremonies_dates_day" value="{{ old('ceremonies_dates_day') }}">
+                                        {{-- date_selectbox.jsにて管理 --}}
                                     </select>
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
-                                    <label for="ceremonies_dates_time" class="label">
-                                        <span class="label-text">time</span>
+                                    <label for="attendance_contact_limit_day" class="label">
+                                        <span class="label-text">出欠連絡 締切日</span>
                                     </label>
-                                    <input type="time" class="select select-bordered dark:bg-white" id="ceremonies_dates_time" name="ceremonies_dates_time">
+                                    <input type="date" class="select select-bordered dark:bg-white" id="attendance_contact_limit_day" name="attendance_contact_limit_day" value="{{ old('attendance_contact_limit_day') }}">
                                 </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="ceremonies_reception_time" class="label">
+                                        <span class="label-text">受付時間</span>
+                                    </label>
+                                    <input type="time" class="select select-bordered dark:bg-white" id="ceremonies_reception_time" name="ceremonies_reception_time" value="{{ old('ceremonies_reception_time') }}">
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="start_ceremonies_time" class="label">
+                                        <span class="label-text">結婚式 開始時間</span>
+                                    </label>
+                                    <input type="time" class="select select-bordered dark:bg-white" id="start_ceremonies_time" name="start_ceremonies_time" value="{{ old('start_ceremonies_time') }}">
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="start_wedding_reception_time" class="label">
+                                        <span class="label-text">披露宴 開始時間</span>
+                                    </label>
+                                    <input type="time" class="select select-bordered dark:bg-white" id="start_wedding_reception_time" name="start_wedding_reception_time" value="{{ old('start_wedding_reception_time') }}">
+                                </div>
+                                
                             </div>
                             
                             <h3 class="w-full text-lg mt-4">会場</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
                                 {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング、無理なら地図なし --}}
-                                <div class="form-control w-full max-w-xs">
-                                    <label for="place_name" class="label">
-                                        <span class="label-text">chapel / venue name</span>
-                                    </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名">
-                                </div>
                                 <div class="form-control w-full max-w-xs px-1">
                                     <label for="place_state" class="label">
-                                        <span class="label-text">state</span>
+                                        <span class="label-text">都道府県</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_state" name="place_state" placeholder="都道府県">
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_state" name="place_state" value="{{ old('place_state') }}">
                                 </div>
                                 <div class="form-control w-full max-w-xs">
                                     <label for="place_city" class="label">
-                                        <span class="label-text">city</span>
+                                        <span class="label-text">市区町村</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_city" name="place_city" placeholder="市">
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_city" name="place_city" value="{{ old('place_city') }}">
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
                                     <label for="place_address_line" class="label">
-                                        <span class="label-text">Address Line</span>
+                                        <span class="label-text">番地・号</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address_line" name="place_address_line" placeholder="区町村・番地・号">
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_address_line" name="place_address_line" value="{{ old('place_address_line') }}">
                                 </div>                                
+                                <div class="form-control w-full max-w-xs">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">会場名</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" old="{{ old('place_name') }}">
+                                </div>
                             </div>
+                            <div class="w-full flex justify-end mt-5">
+                                <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
+                                {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
+                            </div>
+
+                            @if ($ceremony_info != null)
                             <h3 class="w-full text-lg mt-4">現在設定</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 w-full justify-center mx-auto">
                                 {{-- //TODO:Yahoo!ローカルサーチAPIの登録、住所からジオコーディング、無理なら地図なし --}}
-                                <div class="form-control w-full max-w-xs">
+                                <div class="form-control w-full max-w-xs px-1">
                                     <label for="place_name" class="label">
-                                        <span class="label-text">日時</span>
+                                        <span class="label-text">日付</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名" value="{{ $ceremony_info->date_and_time }}"  disabled>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="day" name="day" placeholder="日付" value="{{ $ceremony_info->wedding_date }}"  disabled>
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
                                     <label for="place_name" class="label">
-                                        <span class="label-text">会場</span>
+                                        <span class="label-text">受付開始時間</span>
                                     </label>
-                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名" value="{{ $ceremony_info->place_name }}"  disabled>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="start_reception" name="start_reception" placeholder="受付開始時間" value="{{ $ceremony_info->reception_time }}"  disabled>
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">結婚式 開始時間</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="start_ceremony" name="start_ceremony" placeholder="結婚式 開始時間" value="{{ $ceremony_info->start_ceremony_time }}"  disabled>
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">披露宴 開始時間</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="start_wedding_reception" name="start_wedding_reception" placeholder="披露宴 開始時間" value="{{ $ceremony_info->start_wedding_reception_time }}"  disabled>
                                 </div>
                                 <div class="form-control w-full max-w-xs px-1">
                                     <label for="place_state" class="label">
                                         <span class="label-text">住所</span>
                                     </label>
                                     <input type="text" class="input input-bordered dark:bg-white" id="place_state" name="place_state" placeholder="都道府県" value="{{ $ceremony_info->address }}" disabled>
+                                </div>
+                                <div class="form-control w-full max-w-xs px-1">
+                                    <label for="place_name" class="label">
+                                        <span class="label-text">会場</span>
+                                    </label>
+                                    <input type="text" class="input input-bordered dark:bg-white" id="place_name" name="place_name" placeholder="会場名" value="{{ $ceremony_info->place_name }}"  disabled>
                                 </div>                             
                             </div>
+                            @endif
                             <div class="flex w-full justify-center">
                                 @if ($ceremony_info)
                                 <div id="map" class="w-full md:w-1/2 h-96 mt-16 bg-slate-500">
@@ -232,23 +279,18 @@
                                 
                             </div>
                             
-                            <div class="w-full flex justify-end mt-5">
-                                <button type="submit" class="btn btn-active btn-ghos">アップロード</button>
-                                {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
-                            </div>
-                            
                         </form>
                     </div>
                 </div>
 
                 {{-- アルバム掲示セクション --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
+                <div id="album" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">アルバム掲示</h2>
                     <div class="p-0 mt-4 bg-white">
-                        @if (count($errors) > 0)
+                        @if (count($errors->uploadPhoto) > 0)
                             <div>   
                                 <ul class="mt-3 list-disc list-inside text-sm text-red-600">
-                                    @foreach ($errors->all() as $error)
+                                    @foreach ($errors->uploadPhoto->all() as $error)
                                         <li>{{ $error }}</li>
                                     @endforeach
                                 </ul>
@@ -265,8 +307,6 @@
                                 {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
                             </div>
                         </form>
-                        {{-- //TODO:画像表示は別ページへ --}}
-                        {{-- //TODO:画像表示(3列*n行) 画像にRemoveのリンク --}}
                         {{-- //TODO:画像アップロードがなければないことを表す文を表示 --}}
                         {{-- //TODO:colorboxの適応（imgタグをaタグで囲む） --}}
                         
@@ -274,42 +314,58 @@
                 </div>
 
                 {{-- ふたりへの質問のセクション --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
+                <div id="questions" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 mt-5">
                     <h2 class="border-b border-grey-400">ふたりへの質問</h2>
                     <p class="text-gray-400">※この回答は来客へ開示されます</p>
+                    <p class="text-gray-400">※一度回答頂いている場合、回答内容が更新されます</p>
                     <div class="grid grid-cols-2 mt-5">
                         {{-- //TODO:新郎Q&A Controller --}}
                         <form action="{{ route('Q_and_A_for_Groom') }}" method="POST" class="w-full ">
                             @csrf
                             <div class="w-full py-2 pr-2 border-r-2">
-                                <p class="text-gray-400">新郎様</p>
+                                <p class="text-gray-400">新郎</p>
                                 <div class="mb-2">
                                     <label for="Q1forGroom" class="w-full">
-                                        <span class="label-text">新婦様の第一印象は？</span>
+                                        @if (optional($ceremony_info)->bride_name !== null)
+                                        <span class="label-text">{{ optional($ceremony_info)->bride_name }}様の第一印象は？</span>
+                                        @else
+                                        <span class="label-text">新婦の第一印象は？</span>
+                                        @endif
                                     </label>
-                                    <input type="text" name="Q1forGroom" id="Q1forGroom" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q1forGroom" id="Q1forGroom" class="input input-bordered w-full dark:bg-white" value="{{ old('Q1forGroom') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q2forGroom" class="w-full">
-                                        <span class="label-text">新婦様の現在の印象は？</span>
+                                        @if (optional($ceremony_info)->bride_name !== null)
+                                        <span class="label-text">{{ optional($ceremony_info)->bride_name }}様の現在の印象は？</span>
+                                        @else
+                                        <span class="label-text">新婦の現在の印象は？</span>
+                                        @endif
                                     </label>
-                                    <input type="text" name="Q2forGroom" id="Q2forGroom" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q2forGroom" id="Q2forGroom" class="input input-bordered w-full dark:bg-white" value="{{ old('Q2forGroom') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q3forGroom w-full">
                                         <span class="label-text">1番の思い出は？</span>
                                     </label>
-                                    <input type="text" name="Q3forGroom" id="Q3forGroom" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q3forGroom" id="Q3forGroom" class="input input-bordered w-full dark:bg-white" value="{{ old('Q3forGroom') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q4forGroom w-full">
-                                        <span class="label-text">結婚を祝ってくださる方へのメッセージを！</span>
+                                        <span class="label-text">馴れ初めなど</span>
                                     </label>
-                                    <textarea name="Q4forGroom" id="Q4forGroom" cols="30" rows="10" class="textarea textarea-bordered w-full mt-2 dark:bg-white"></textarea>
+                                    <textarea name="Q4forGroom" id="Q4forGroom" cols="30" rows="10" class="textarea textarea-bordered w-full mt-2 dark:bg-white">{{ old('Q4forGroom') }}</textarea>
                                 </div>
+                                @if (count($groom_answers) === 0)
                                 <div class="flex w-full justify-end">
                                     <button type="submit" class="btn btn-active btn-ghos ">アップロード</button>
+                                </div>    
+                                @else
+                                <div class="flex w-full justify-end">
+                                    <button type="submit" class="btn btn-active btn-ghos ">更新</button>
                                 </div>
+                                @endif
+                                
                             </div>
                         </form>
 
@@ -317,34 +373,48 @@
                         <form action="{{ route('Q_and_A_for_Bride') }}" method="POST">
                             @csrf
                             <div class="w-full py-2 pl-5">
-                                <p class="text-gray-400">新婦様</p>
+                                <p class="text-gray-400">新婦</p>
                                 <div class="mb-2">
                                     <label for="Q1forBride w-full">
-                                        <span class="label-text">新郎様の第一印象は？</span>
+                                        @if (optional($ceremony_info)->groom_name !== null)
+                                        <span class="label-text">{{ optional($ceremony_info)->groom_name }}様の第一印象は？</span>
+                                        @else
+                                        <span class="label-text">新郎の第一印象は？</span>
+                                        @endif
                                     </label>
-                                    <input type="text" name="Q1forBride" id="Q1forBride" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q1forBride" id="Q1forBride" class="input input-bordered w-full dark:bg-white" value="{{ old('Q1forBride') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q2forBride w-full">
-                                        <span class="label-text">新郎様の現在の印象は？</span>
+                                        @if (optional($ceremony_info)->groom_name !== null)
+                                        <span class="label-text">{{ optional($ceremony_info)->groom_name }}様の現在の印象は？</span>
+                                        @else
+                                        <span class="label-text">新郎の現在の印象は？</span>
+                                        @endif
                                     </label>
-                                    <input type="text" name="Q2forBride" id="Q2forBride" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q2forBride" id="Q2forBride" class="input input-bordered w-full dark:bg-white" value="{{ old('Q2forBride') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q3forBride w-full">
                                         <span class="label-text">1番の思い出は？</span>
                                     </label>
-                                    <input type="text" name="Q3forBride" id="Q3forBride" class="input input-bordered w-full dark:bg-white">
+                                    <input type="text" name="Q3forBride" id="Q3forBride" class="input input-bordered w-full dark:bg-white" value="{{ old('Q3forBride') }}">
                                 </div>
                                 <div class="mb-2">
                                     <label for="Q4forBride w-full">
-                                        <span class="label-text">結婚を祝ってくださる方へのメッセージを！</span>
+                                        <span class="label-text">馴れ初めなど</span>
                                     </label>
-                                    <textarea name="Q4forBride" id="Q4forBride" cols="30" rows="10" class="textarea textarea-bordered w-full mt-2 dark:bg-white"></textarea>
+                                    <textarea name="Q4forBride" id="Q4forBride" cols="30" rows="10" class="textarea textarea-bordered w-full mt-2 dark:bg-white">{{ old('Q4forBride') }}</textarea>
                                 </div>
+                                @if (count($bride_answers) === 0)
                                 <div class="flex w-full justify-end">
                                     <button type="submit" class="btn btn-active btn-ghos ">アップロード</button>
+                                </div>    
+                                @else
+                                <div class="flex w-full justify-end">
+                                    <button type="submit" class="btn btn-active btn-ghos ">更新</button>
                                 </div>
+                                @endif
                                 
                             </div>
                         </form>
@@ -366,6 +436,7 @@
                                 <input type="text" name="Q1forGuest" id="Q1forGuest" class="input input-bordered w-full dark:bg-white">
                             </div>
                         </div>
+                        {{-- 追加はaddQuestions.jsにて管理 --}}
                         <div class="flex justify-end mt-5">
                             <button type="button" id="addQuestion" class="btn btn-active btn-ghos text-lg">+</button>
                         </div>
@@ -374,8 +445,36 @@
                         </div>
                     </form>
 
-                    <div>
-
+                    <div class="block w-full mt-5">
+                        @if (count($errors->delete_question) > 0)
+                            <div>           
+                                <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                                    @foreach ($errors->delete_question->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        @foreach ($questions as $question)
+                        <div class="flex w-full justify-between mt-2">
+                            <p>{{ $question->question_body }}</p>
+                            <form action="{{ route('delete_question') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="delete_target_id" value="{{ $question->id }}">
+                                <input type="hidden" name="delete_target_body" value="{{ $question->question_body }}">
+                                <div>
+                                    <button type="submit" class="btn btn-active btn-ghos w-16 ml-2">削除</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                        @endforeach
+                        <div class="w-full flex justify-center my-5">
+                            <a href="{{ route('answers') }}" class="btn btn-outline">皆さんからの回答を見る</a>
+                        </div>
+                    </div>
+                    <div class="w-full justify-center">
+                        {{ $questions->links() }}
                     </div>
                 </div>
                 <div class="flex w-full mt-5 justify-end pr-5">
@@ -390,7 +489,10 @@
 <script type="text/javascript" src="{{ mix('js/date_selectbox.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/getUsersInformation.js') }}"></script>
 <script type="text/javascript" src="{{ mix('js/addQuestion.js') }}"></script>
-<script async defer src="//maps.googleapis.com/maps/api/js?key={{ env('MIX_GOOGLE_MAPS_API_KEY') }}"></script>
-<script type="text/javascript" src="{{ mix('js/googleMapsApi.js') }}"></script>
+@if (optional($ceremony_info)->address)
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('MIX_GOOGLE_MAPS_API_KEY') }}"></script>
+<script type="text/javascript" src="{{ mix('js/googleMapsApi.js') }}"></script>    
+@endif
+<script type="text/javascript" src="{{ mix('js/popupImage.js') }}"></script>
 
 

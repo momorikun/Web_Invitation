@@ -1,3 +1,4 @@
+@section('title', '| 受付用QRコードリーダ')
 <x-app-layout>
     <x-slot name="header" >
         

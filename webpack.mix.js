@@ -22,6 +22,7 @@ mix
     .js('resources/js/popupImage.js', 'public/js')
     .js('resources/js/googleMapsApi.js', 'public/js')
     .js('resources/js/deletePhotosInAlbumPage.js', 'public/js')
+    .js('resources/js/popup_confirmation.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],
@@ -31,6 +32,9 @@ mix
         require('autoprefixer'),
     ])
     .postCss('resources/css/popupImage.css', 'public/css', [
+        require('autoprefixer'),
+    ])
+    .postCss('resources/css/popupModal.css', 'public/css', [
         require('autoprefixer'),
     ]);
 // mix

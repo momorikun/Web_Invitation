@@ -9,6 +9,7 @@
         <!-- Validation Errors -->
         <x-auth-validation-errors class="mb-4" :errors="$errors"/>
         
+        
         <form id="registerForm" method="POST" action="{{ route('register') }}">
             @csrf
             
@@ -50,8 +51,14 @@
                                 name="password_confirmation" required />
             </div>
             <!-- ceremonies_id -->
+            
             <div class="mt-4">
                 <x-label for="ceremonies_id" value="{{ __('挙式ID') }}" />
+                @if(session()->has('error'))
+                <div class="mt-3 list-disc list-inside text-sm text-red-600">
+                    {{session('error')}}
+                </div>
+                @endif
                 <x-input id="ceremonies_id" class="block mt-1 w-full" type="text" name="ceremonies_id" :value="old('ceremonies_id')" required />
             </div>
 

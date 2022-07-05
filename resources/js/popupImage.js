@@ -3,6 +3,7 @@ $(function(){
 
     $('.show_pop').each(function(){
         $(this).on('click',function(){
+            if($('.delete-mode-toggle-btn').hasClass('mode-active')) return;
             $(this).next('.modal_pop').fadeIn();
         })
     });

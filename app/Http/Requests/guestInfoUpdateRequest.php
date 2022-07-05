@@ -30,7 +30,7 @@ class guestInfoUpdateRequest extends FormRequest
             'updateKana'      => ['required', 'string', 'min:2', 'max:255'],
             'updateEmail'     => ['required', 'string', 'email', 'max:255'],
             'updateGiftMoney' => ['integer', 'nullable'],
-            'updateRemarks'   => ['string', 'max:30', 'nullable'],
+            'updateRemarks'   => ['string', 'max:255', 'nullable'],
         ];
     }
 }

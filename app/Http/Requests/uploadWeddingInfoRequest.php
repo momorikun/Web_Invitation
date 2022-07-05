@@ -25,11 +25,15 @@ class uploadWeddingInfoRequest extends FormRequest
     public function rules()
     {
         return [
-            'upload_user_ceremony_id'=> ['required', 'string'],
-            'ceremonies_dates_year'  => ['required', 'string'],
-            'ceremonies_dates_month' => ['required', 'string'],
-            'ceremonies_dates_day'   => ['required', 'string'],
-            'ceremonies_dates_time'  => ['required', 'date_format:"H:i"'],
+            'groom_name'         => ['required', 'string'],
+            'bride_name'         => ['required', 'string'],
+            'attendance_contact_limit_day'=>['required', 'date'],
+            'ceremonies_dates_year'  => ['required', 'date_format:"Y"'],
+            'ceremonies_dates_month' => ['required', 'date_format:"m"'],
+            'ceremonies_dates_day'   => ['required', 'date_format:"d"'],
+            'ceremonies_reception_time'   => ['required', 'date_format:"H:i"'],
+            'start_ceremonies_time'       => ['required', 'date_format:"H:i"'],
+            'start_wedding_reception_time'=> ['required', 'date_format:"H:i"'],
             'place_name'         => ['required', 'string'],
             'place_state'        => ['required', 'string'],
             'place_city'         => ['required', 'string'],

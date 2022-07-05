@@ -9,6 +9,15 @@ use App\Models\User;
 class QrCheckInController extends Controller
 {
     /**
+     * QRコード用ページ
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function checkin_page(){
+        return view('qrcode_for_checkin');
+    }
+    
+    /**
      * QRコードリーダー画面を返す
      *
      * @return void

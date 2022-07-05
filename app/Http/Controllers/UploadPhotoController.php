@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UploadsPhoto;
 use App\Http\Requests\StoreUploadPhotoRequest;
 use App\Http\Requests\UpdateUploadPhotoRequest;
+use App\Http\Requests\delete_photosRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\Paginator;
@@ -21,9 +22,13 @@ class UploadPhotoController extends Controller
     {
         //渡す情報
         $photos = UploadsPhoto::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-                  ->WHERE('is_seating_chart', 0)->paginate(12);
-
-        return view('albums_page', compact('photos'));
+                  ->WHERE('is_seating_chart', 0)->WHERE('deleted_at', null)->paginate(12);
+        if($photos[0] != null) {
+            return view('albums_page', compact('photos'));
+        } else {
+            return view('no_info');
+        }
+        
     }
 
     /**
@@ -44,10 +49,6 @@ class UploadPhotoController extends Controller
      */
     public function store(StoreUploadPhotoRequest $request)
     {        
-        $request->validate([
-            'files.*.upload_photo' => 'image|mimes:jpeg,bmp,png',
-        ]);
-    
         $upload_files = $request->file('files');  
 
         foreach($upload_files as $index => $element) {
@@ -106,13 +107,14 @@ class UploadPhotoController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request
-     * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function delete_photos(delete_photosRequest $request)
     {
-        // TODO:Storageからの削除、DBからの削除
-        $path = $request->only(['photo_path']);
-        Storage::disk('uploads_photo')->delete($path);
+        $path = $request->photo_path;
+        
+        UploadsPhoto::WHERE('photo_path', $request->photo_path)->delete();
+        Storage::disk('public')->delete($path);
+        return back();
     }
 
     /**
@@ -125,11 +127,6 @@ class UploadPhotoController extends Controller
         if($request['file'] === null) {
             return back()->with('message', '画像を選択してください。');
         };
-
-        $request->validate([
-            'upload_user_email' => ['required', 'email'],
-            'file' => 'image|mimes:jpeg,bmp,png',
-        ]);
 
         $upload_file = $request->file('file');
         $own_ceremony_id = Auth::User()->ceremonies_id;

@@ -40,7 +40,7 @@ $(function(){
     initMap(lat, lng);
   })
   .fail(function(error){
-    alert('予期せぬエラーが起こりました');
+    
     console.log(error);
   })
 

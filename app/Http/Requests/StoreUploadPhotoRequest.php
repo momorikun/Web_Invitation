@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUploadPhotoRequest extends FormRequest
 {
+    protected $errorBag = 'uploadPhoto';
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,7 +25,7 @@ class StoreUploadPhotoRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'files.*.upload_photo' => 'image|mimes:jpeg,bmp,png',
         ];
     }
 }

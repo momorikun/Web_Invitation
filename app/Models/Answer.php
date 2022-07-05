@@ -10,12 +10,14 @@ class Answer extends Model
     use HasFactory;
     
     protected $fillable = [
-        'is_bride',
+        'id',
+        'question_id',
+        'upload_user_type',
         'answer_body',
         'upload_user_ceremony_id',
     ];
     protected $hidden = [
-        'id',
+        
     ];
     protected $casts = [
 

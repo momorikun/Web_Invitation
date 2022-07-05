@@ -12,6 +12,9 @@ module.exports = {
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
+            backgroundImage: theme => ({
+                'guest-top': "url('topsecstion_bg.jpg')",
+            })
         },
     },
 

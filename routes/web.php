@@ -7,6 +7,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\UploadPhotoController;
 use App\Http\Controllers\Auth\QrCheckInController;
 use App\Models\UploadPhoto;
+use App\Models\Ceremony;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,13 +23,8 @@ use Illuminate\Support\Facades\Auth;
 */
 // TODO:写真やコメントの混合を防ぐためルーティングで/{ceremonies_id}/を入れる必要がある⇒？？？
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/', [GuestController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [GuestController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 //当日出席関連
 Route::post('/qr_login', 'Auth\\QrCheckInController@login');
@@ -68,14 +64,20 @@ Route::group(
 
         //アルバム掲示関連
         Route::resource('/upload_photo', 'UploadPhotoController')->name('store', 'upload_photo');
-        
 
         //ふたりへの質問関連
         Route::post('/Q_and_A_for_Groom', [AdminController::class, 'Q_and_A_for_Groom'])->name('Q_and_A_for_Groom');
         Route::post('/Q_and_A_for_Bride', [AdminController::class, 'Q_and_A_for_Bride'])->name('Q_and_A_for_Bride');
 
         //ゲストへの質問関連
-        Route::post('/QuestionForGuest', [AdminController::class, 'QuestionForGuest'])->name('QuestionForGuest');
+        Route::post('/QuestionForGuest', 'AdminController@QuestionForGuest')->name('QuestionForGuest');
+        Route::post('/delete_question', [AdminController::class, 'delete_question'])->name('delete_question');
+
+        //回答一覧ページ
+        Route::get('/answers', [AdminController::class, 'answers'])->name('answers');
+
+        //メッセージ確認
+        Route::get('/message_page', [AdminController::class, 'message_page'])->name('message_page');
     }
 );
 Route::group(
@@ -83,12 +85,32 @@ Route::group(
         'prefix' => '/guest', 
         'middleware' => ['auth']
     ], function(){
-        Route::get('/', function(){
-            return view('dashboard');
-        })->middleware(['auth'])->name('dashboard');
+        Route::get('/', [GuestController::class, 'index'])->middleware(['auth'])->name('dashboard');
+        
+        //出席確認
+        Route::post('answer_for_attendance', [GuestController::class, 'answer_for_attendance'])->middleware(['auth'])->name('answer_for_attendance');
+
+        //座席表ページ
+        Route::get('seating_chart', [GuestController::class, 'seating_chart'])->name('seating_chart');
+
+        //新郎新婦についてページ
+        Route::get('about_us', [GuestController::class, 'about_us'])->name('about_us');
+
+        //質問ページ
+        Route::get('question_for_guest', [GuestController::class, 'question_for_guest'])->name('question_for_guest');
+        Route::post('answer_questions', [GuestController::class, 'answer_questions'])->name('answer_questions');
 
         //アルバム掲示関係
         Route::get('/album_page', [UploadPhotoController::class, 'index'])->name('album_page');
+        Route::post('/delete_photos', [UploadPhotoController::class, 'delete_photos'])->name('delete_photos');
+
+        //QRコードページ
+        Route::get('/qrcode_for_checkin', [QrCheckInController::class, 'checkin_page'])->name('qrcode_for_checkin');
+
+        //メッセージ投稿
+        Route::get('/message_for_couple', [GuestController::class, 'message_for_couple'])->name('message_for_couple');
+        Route::post('/message_confirm', [GuestController::class, 'message_confirm'])->name('message_confirm');
+        Route::get('/message_send', [GuestController::class, 'message_send'])->name('message_send');
     }
 );
 

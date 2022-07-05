@@ -153,6 +153,37 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'guestSearchInputKana' => 'ゲスト名(カナ)',
+        'groom_name' => '新郎名',
+        'bride_name' => '新婦名',
+        'ceremonies_dates_year' => '開催年',
+        'ceremonies_dates_month'=> '開催月',
+        'ceremonies_dates_day'  => '開催日',
+        'attendance_contact_limit_day' => '回答期限',
+        'ceremonies_reception_time'    => '受付開始時間',
+        'start_ceremonies_time' => '結婚式 開始時間',
+        'start_wedding_reception_time' => '披露宴 開始時間',
+        'place_state'=> '県',
+        'place_city' => '市区町村',
+        'place_address_line'   => '番地・号',
+        'place_name' => '会場名',
+        'Q1forGroom' => 'Q1への回答',
+        'Q2forGroom' => 'Q2への回答',
+        'Q3forGroom' => 'Q3への回答',
+        'Q4forGroom' => 'Q4への回答',
+        'Q1forBride' => 'Q1への回答',
+        'Q2forBride' => 'Q2への回答',
+        'Q3forBride' => 'Q3への回答',
+        'Q4forBride' => 'Q4への回答',
+        'Q1forGuest' => 'ゲストへの質問1',
+        'Q2forGuest' => 'ゲストへの質問2',
+        'Q3forGuest' => 'ゲストへの質問3',
+        'Q4forGuest' => 'ゲストへの質問4',
+        'Q5forGuest' => 'ゲストへの質問5',
+        'attendance' => '出欠確認',
+        'message_for_couple' => 'ふたりへのメッセージ',
+        'answer_body'=> '回答',
+    ],
 
 ];

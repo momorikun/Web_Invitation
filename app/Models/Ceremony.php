@@ -10,13 +10,20 @@ class Ceremony extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'ceremony_id',
+        'groom_name',
+        'bride_name',
+        'attendance_contact_limit_day',
+        'wedding_date',
+        'reception_time',
+        'start_ceremony_time',
+        'start_wedding_reception_time',
         'place_name',
         'address',
-        'date_and_time',
     ];
     protected $hidden = [
-        'id',
+        
     ];
     protected $casts = [
         

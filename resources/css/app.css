@@ -25,6 +25,7 @@
     transform: translateY(0);
   }
 }
+
 /* スクロールをしたら出現する要素にはじめに透過0を指定　*/
      
 .fadeUpTrigger{

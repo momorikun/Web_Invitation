@@ -10,12 +10,14 @@ class Question extends Model
     use HasFactory;
     
     protected $fillable = [
+        'id',
         'upload_user_email',
         'question_body',
         'upload_user_ceremony_id',
+        'deleted_at',
     ];
     protected $hidden = [
-        'id',
+        
     ];
     protected $casts = [
         

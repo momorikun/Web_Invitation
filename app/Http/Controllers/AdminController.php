@@ -8,14 +8,17 @@ use App\Models\User;
 use App\Models\UploadsPhoto;
 use App\Models\Ceremony;
 use App\Models\Answer;
+use App\Models\Message;
 use App\Http\Requests\guestInfoUpdateRequest;
 use App\Http\Requests\getSearchedGuestRequest;
 use App\Http\Requests\Question_for_Bride_Request;
 use App\Http\Requests\Question_for_Groom_Request;
 use App\Http\Requests\QuestionForGuestRequest;
 use App\Http\Requests\uploadWeddingInfoRequest;
+use App\Http\Requests\delete_questionRequest;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\Paginator;
 
 class AdminController extends Controller
 {
@@ -32,8 +35,11 @@ class AdminController extends Controller
         $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 0)->orderby('created_at', 'desc')->get();
         $seating_img = UploadsPhoto::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('is_seating_chart', 1)->first();
         $ceremony_info = Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->first();
+        $groom_answers = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('upload_user_type', 0)->get();
+        $bride_answers = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('upload_user_type', 1)->get();
+        $questions = Question::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('deleted_at', null)->paginate(5);
 
-        return view('admin', compact('users', 'uploads_photos', 'seating_img', 'ceremony_info'));
+        return view('admin', compact('users', 'uploads_photos', 'seating_img', 'ceremony_info', 'groom_answers', 'bride_answers', 'questions'));
     }
 
     /**
@@ -151,43 +157,66 @@ class AdminController extends Controller
      */
     public function upload_wedding_info(uploadWeddingInfoRequest $request){
         $data = $request->only([
-            'upload_user_ceremony_id',
+            'groom_name',
+            'bride_name',
+            'attendance_contact_limit_day',
             'ceremonies_dates_year',
             'ceremonies_dates_month',
             'ceremonies_dates_day',
-            'ceremonies_dates_time',
-            'place_name',
+            'ceremonies_reception_time',
+            'start_ceremonies_time',
+            'start_wedding_reception_time',
             'place_state',
             'place_city',
             'place_address_line',
+            'place_name',
         ]);
         $address_elem = $request->only(['place_state', 'place_city', 'place_address_line']);
         $address = implode($address_elem);
         
         $date_elem = $request->only(['ceremonies_dates_year', 'ceremonies_dates_month', 'ceremonies_dates_day']);
-        $time = $data['ceremonies_dates_time'];
-        $date_str = implode("-", $date_elem)." ".$time;
+        $date_str = $date_elem['ceremonies_dates_year']."年".$date_elem['ceremonies_dates_month']."月".$date_elem['ceremonies_dates_day']."日";
 
-        $exist = Ceremony::WHERE('ceremony_id', $data['upload_user_ceremony_id'])->get();
+        $exist = Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->get();
 
+        $marge_units_n_limit = [];
+        $units = ['年', '月', '日'];
+        $limit = explode('-' ,$data['attendance_contact_limit_day']);
+        for($i = 0; $i < count($units); ++$i){
+            $marge_units_n_limit[] = $limit[$i];
+            $marge_units_n_limit[] = $units[$i];
+        }
+        $marge_result = implode($marge_units_n_limit);
+        
         if(count($exist) > 0) {
-            Ceremony::WHERE('ceremony_id', $data['upload_user_ceremony_id'])->update([
-                'place_name' => $data['place_name'],
-                'address' => $address,
-                'date_and_time' => $date_str,
+            Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->update([
+                'groom_name'   => $data['groom_name'],
+                'bride_name'   => $data['bride_name'],
+                'attendance_contact_limit_day' => $marge_result,
+                'wedding_date' => $date_str,
+                'reception_time' => $data['ceremonies_reception_time'],
+                'start_ceremony_time' => $data['start_ceremonies_time'],
+                'start_wedding_reception_time' => $data['start_wedding_reception_time'],
+                'place_name'   => $data['place_name'],
+                'address'      => $address,
             ]);
         } else {
             Ceremony::create([
-                'ceremony_id'  => $data['upload_user_ceremony_id'],
+                'ceremony_id'  => Auth::User()->ceremonies_id,
+                'groom_name'   => $data['groom_name'],
+                'bride_name'   => $data['bride_name'],
+                'attendance_contact_limit_day' => $marge_result,
+                'wedding_date' => $date_str,
+                'reception_time' => $data['ceremonies_reception_time'],
+                'start_ceremony_time' => $data['start_ceremonies_time'],
+                'start_wedding_reception_time' => $data['start_wedding_reception_time'],
                 'place_name'   => $data['place_name'],
                 'address'      => $address,
-                'date_and_time'=> $date_str,
+                'wedding_date'=> $date_str,
             ]);
         }
         
         return back();
-        // return view('test', compact('dates'));
-        // TODO: ジオコーディングAPIに住所を投げる　https://map.yahooapis.jp/geocode/V1/geoCoder?appid=<あなたのアプリケーションID>&query=%e6%9d%b1%e4%ba%ac%e9%83%bd%e6%b8%af%e5%8c%ba%e5%85%ad%e6%9c%ac%e6%9c%a8
     }
 
     /**
@@ -209,23 +238,19 @@ class AdminController extends Controller
         ->get();
 
         if(count($exist) > 0){
-            foreach($data as $item){
-                Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-                ->WHERE('upload_user_type', 0)
-                ->update([
-                    'answer_body' => $item['Q1forGroom'],
-                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
-                ]);
-            }
-        } else {
-            foreach($data as $item){
-                Answer::create([
-                    'upload_user_type' => 0,
-                    'answer_body' => $item,
-                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
-                ]);
-            }
+            Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+            ->WHERE('upload_user_type', 0)
+            ->delete();
+        } 
+
+        foreach($data as $item){
+            Answer::create([
+                'upload_user_type' => 0,
+                'answer_body' => $item,
+                'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+            ]);
         }
+        
         return back();
         
     }
@@ -248,23 +273,18 @@ class AdminController extends Controller
         ->get();
 
         if(count($exist) > 0){
-            foreach($data as $item){
-                Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
-                ->WHERE('upload_user_type', 1)
-                ->update([
-                    'answer_body' => $item,
-                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
-                ]);
-            }
-        } else {
-            foreach($data as $item){
-                Answer::create([
-                    'upload_user_type' => 1,
-                    'answer_body' => $item,
-                    'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
-                ]);
-            }
+            Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)
+            ->WHERE('upload_user_type', 1)
+            ->delete();
         } 
+        foreach($data as $item){
+            Answer::create([
+                'upload_user_type' => 1,
+                'answer_body' => $item,
+                'upload_user_ceremony_id' => Auth::User()->ceremonies_id,
+            ]);
+        }
+        
         return back();
     }
     /**
@@ -284,6 +304,7 @@ class AdminController extends Controller
         ]);
 
         foreach($data as $item){
+            if($item == null) break;
             Question::create([
                 'upload_user_email' => Auth::User()->email,
                 'question_body' => $item,
@@ -291,5 +312,42 @@ class AdminController extends Controller
             ]);
         }
         return back();
+    }
+
+    /**
+     * ゲストへの質問削除
+     * 
+     * @param Request $request
+     * @return void
+     */
+    public function delete_question(delete_questionRequest $request){
+        
+        $target = $request->only([
+            'delete_target_id',
+            'delete_target_body',
+        ]);
+        Question::WHERE('id', $target)->delete();
+        return back();
+    }
+
+    /**
+     * ゲストからの回答を見るページ
+     * @return Response
+     */
+    public function answers(){
+        $answers = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('upload_user_type', 3)->get();
+        $questions = Question::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->get();
+        $items = Question::JOIN('answers', 'questions.id', '=', 'answers.question_id')->get();
+        
+        return view('answers', compact('items', 'questions', 'answers'));
+    }
+
+    /**
+     * ゲストからのメッセージ確認
+     * @return response
+     */
+    public function message_page(){
+        $messages = Message::WHERE('ceremony_id', Auth::User()->ceremonies_id)->get();
+        return view('message_page', compact('messages'));
     }
 }
