@@ -8,6 +8,7 @@
         <div class="md:flex w-full justify-center h-full">
             @if ($ceremony_info)
             <div class="w-full sm:max-w-md my-16 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                @if(count($groom_answer) > 0)
                 <div>
                     <label class="block font-medium text-sm text-center text-gray-700" for="attendance">{{ optional($ceremony_info)->groom_name }} 様のご回答</label>
                     <div class="w-full mt-5">
@@ -29,9 +30,18 @@
                         </div>
                     </div>    
                 </div>
+                @else
+                <div>
+                    <p class="text-center">ただいま準備中です。</p>
+                    <br>
+                    <p class="text-center">アップロードされるまで</p>
+                    <p class="text-center">今しばらくお待ちください。</p>
+                </div>
+                @endif
             </div>
             <div class="w-full sm:max-w-md my-16 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg md:ml-2">
-                <div class="">
+                @if(count($bride_answer) > 0)
+                <div>
                     <label class="block font-medium text-sm text-center text-gray-700" for="attendance">{{ optional($ceremony_info)->bride_name }} 様のご回答</label>
                     <div class="w-full mt-5">
                         <div class="w-full block md:flex justify-between">
@@ -52,6 +62,14 @@
                         </div>
                     </div>    
                 </div>
+                @else
+                <div>
+                    <p class="text-center">ただいま準備中です。</p>
+                    <br>
+                    <p class="text-center">アップロードされるまで</p>
+                    <p class="text-center">今しばらくお待ちください。</p>
+                </div>
+                @endif
             </div>
             @else
             <div class="md:flex w-full justify-center h-full">

@@ -154,6 +154,7 @@ return [
     */
 
     'attributes' => [
+        'ceremonies_id' => '挙式ID',
         'guestSearchInputKana' => 'ゲスト名(カナ)',
         'groom_name' => '新郎名',
         'bride_name' => '新婦名',

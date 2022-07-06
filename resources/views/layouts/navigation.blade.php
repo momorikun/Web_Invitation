@@ -156,7 +156,7 @@
             <x-responsive-nav-link :href="route('seating_chart')" :active="request()->routeIs('dashboard')">
                 {{ __('座席表') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="#ceremony-info" :active="request()->routeIs('dashboard')">
+            <x-responsive-nav-link href="/guest#ceremony-info" :active="request()->routeIs('dashboard')">
                 {{ __('式詳細') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('about_us')" :active="request()->routeIs('dashboard')">
