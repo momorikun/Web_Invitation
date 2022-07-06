@@ -25,7 +25,7 @@
                             </ul>
                         </div>
                     @endif
-                    <div class="grid grid-cols-2 grid-rows-3 gap-2 md:grid-cols-3 w-full justify-center">
+                    <div class="grid grid-cols-1 grid-rows-3 gap-2 md:grid-cols-3 w-full justify-center">
                         @foreach ($questions as $question)
                         <form action="{{ route('answer_questions') }}" method="POST" class="mt-5 border border-slate-300 rounded-md p-2">
                             @csrf
