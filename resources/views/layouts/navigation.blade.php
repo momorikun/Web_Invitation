@@ -11,9 +11,9 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     @if (Auth::User()->user_categories_id === 1)
-                    <a href="{{ route('admin') }}"> {{-- //TODO:adminへのルーティング --}}    
+                    <a href="{{ route('admin') }}"> 
                     @else
-                    <a href="{{ route('dashboard') }}"> {{-- //TODO:adminへのルーティング --}}    
+                    <a href="{{ route('dashboard') }}">
                     @endif
                         <x-application-logo class="block h-10 w-auto fill-current text-gray-600" />
                     </a>
@@ -153,17 +153,17 @@
             <x-responsive-nav-link :href="route('admin')" :active="request()->routeIs('dashboard')">
                 {{ __('Top') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="#ceremony_info" :active="request()->routeIs('dashboard')">
-                {{ __('式情報') }}
+            <x-responsive-nav-link :href="route('seating_chart')" :active="request()->routeIs('dashboard')">
+                {{ __('座席表') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="#ceremony-info" :active="request()->routeIs('dashboard')">
+                {{ __('式詳細') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('about_us')" :active="request()->routeIs('dashboard')">
                 {{ __('新郎新婦について') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('question_for_guest')" :active="request()->routeIs('dashboard')">
                 {{ __('質問回答') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="#ceremony-info" :active="request()->routeIs('dashboard')">
-                {{ __('式詳細設定') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('album_page')" :active="request()->routeIs('dashboard')">
                 {{ __('アルバム') }}
