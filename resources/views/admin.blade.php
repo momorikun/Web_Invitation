@@ -304,11 +304,8 @@
                             <div class="p-6 bg-white flex justify-center w-full">
                                 <button type="submit" class="btn btn-active btn-ghos mr-1">アップロード</button>
                                 <a href="{{ route('album_page') }}" class="btn btn-outline ml-1">写真一覧へ</a>
-                                {{-- <a href="/delete_photo" class="btn btn-active btn-ghos ml-1">編集</a> --}}
                             </div>
                         </form>
-                        {{-- //TODO:画像アップロードがなければないことを表す文を表示 --}}
-                        {{-- //TODO:colorboxの適応（imgタグをaタグで囲む） --}}
                         
                     </div>
                 </div>
@@ -318,11 +315,10 @@
                     <h2 class="border-b border-grey-400">ふたりへの質問</h2>
                     <p class="text-gray-400">※この回答は来客へ開示されます</p>
                     <p class="text-gray-400">※一度回答頂いている場合、回答内容が更新されます</p>
-                    <div class="grid grid-cols-2 mt-5">
-                        {{-- //TODO:新郎Q&A Controller --}}
+                    <div class="block md:grid grid-cols-2 mt-5">
                         <form action="{{ route('Q_and_A_for_Groom') }}" method="POST" class="w-full ">
                             @csrf
-                            <div class="w-full py-2 pr-2 border-r-2">
+                            <div class="w-full py-2 md:pr-4 md:border-r-2">
                                 <p class="text-gray-400">新郎</p>
                                 <div class="mb-2">
                                     <label for="Q1forGroom" class="w-full">
@@ -368,11 +364,9 @@
                                 
                             </div>
                         </form>
-
-                        {{-- //TODO:新婦Q&A Controller --}}
                         <form action="{{ route('Q_and_A_for_Bride') }}" method="POST">
                             @csrf
-                            <div class="w-full py-2 pl-5">
+                            <div class="w-full py-2 md:pl-4">
                                 <p class="text-gray-400">新婦</p>
                                 <div class="mb-2">
                                     <label for="Q1forBride w-full">
