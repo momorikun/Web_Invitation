@@ -337,7 +337,7 @@ class AdminController extends Controller
     public function answers(){
         $answers = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('upload_user_type', 3)->get();
         $questions = Question::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->get();
-        $items = Question::JOIN('answers', 'questions.id', '=', 'answers.question_id')->get();
+        $items = Question::WHERE('questions.upload_user_ceremony_id', Auth::User()->ceremonies_id)->JOIN('answers', 'questions.id', '=', 'answers.question_id')->get();
         
         return view('answers', compact('items', 'questions', 'answers'));
     }

@@ -64,7 +64,6 @@ $(function(){
             })
             .then(function(){
                 alert('ok');
-                location.reload();
             })
             .fail(function(){
                 alert('fail');

@@ -34,7 +34,7 @@
                             </p>    
                             @endif
                             
-                            @if (Auth::User()->is_answered === 1)
+                            @if ( Auth::User()->user_categories_id === 2 && Auth::User()->is_answered === 1 )
                                 @if (Auth::User()->plan_to_attend === 1)
                                 <p class="text-sm text-red-400 text-center">現在の回答内容：ご出席予定</p>        
                                 @else
