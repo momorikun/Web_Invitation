@@ -8,7 +8,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex">
             <div class="justify-between w-full mx-auto">
                 
-                @if ($questions)
+                @if (count($questions) > 0)
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
                     <h2 class="border-b border-grey-400 text-center">質問一覧</h2>
                     @if(session()->has('alert'))
