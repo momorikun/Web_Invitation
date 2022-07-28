@@ -3648,9 +3648,6 @@ body[dir="rtl"] .checkbox:checked,
 .border-l-4 {
   border-left-width: 4px;
 }
-.border-r-2 {
-  border-right-width: 2px;
-}
 .border-r {
   border-right-width: 1px;
 }
@@ -3795,12 +3792,6 @@ body[dir="rtl"] .checkbox:checked,
 .pr-4 {
   padding-right: 1rem;
 }
-.pr-2 {
-  padding-right: 0.5rem;
-}
-.pl-5 {
-  padding-left: 1.25rem;
-}
 .pr-5 {
   padding-right: 1.25rem;
 }
@@ -3818,9 +3809,6 @@ body[dir="rtl"] .checkbox:checked,
 }
 .pb-1 {
   padding-bottom: 0.25rem;
-}
-.pl-4 {
-  padding-left: 1rem;
 }
 .text-center {
   text-align: center;
@@ -4429,14 +4417,6 @@ body[dir="rtl"] .checkbox:checked,
 
   .md\:p-0 {
     padding: 0px;
-  }
-
-  .md\:pr-2 {
-    padding-right: 0.5rem;
-  }
-
-  .md\:pr-3 {
-    padding-right: 0.75rem;
   }
 
   .md\:pr-4 {

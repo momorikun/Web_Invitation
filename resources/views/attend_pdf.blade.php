@@ -1,6 +1,6 @@
 <html lang="ja">
     <head>
-        <title>pdf output test</title>
+        <title>Wedding-Invitation | 出席予定者名簿</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <style>
             @font-face{
