@@ -10,6 +10,7 @@
     "/js/googleMapsApi.js": "/js/googleMapsApi.js",
     "/js/deletePhotosInAlbumPage.js": "/js/deletePhotosInAlbumPage.js",
     "/js/popup_confirmation.js": "/js/popup_confirmation.js",
+    "/js/addInput.js": "/js/addInput.js",
     "/css/app.css": "/css/app.css",
     "/css/popupModal.css": "/css/popupModal.css",
     "/css/popupImage.css": "/css/popupImage.css"

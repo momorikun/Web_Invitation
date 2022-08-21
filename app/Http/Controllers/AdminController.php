@@ -31,7 +31,6 @@ class AdminController extends Controller
     public function index(Request $request)
     {
         //渡す情報
-        $users = User::WHERE('user_categories_id', 1)->orderby('created_at', 'desc')->get();
         $uploads_photos = UploadsPhoto::WHERE('upload_user_email', Auth::User()->email)->WHERE('is_seating_chart', 0)->orderby('created_at', 'desc')->get();
         $seating_img = UploadsPhoto::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('is_seating_chart', 1)->first();
         $ceremony_info = Ceremony::WHERE('ceremony_id', Auth::User()->ceremonies_id)->first();
@@ -39,7 +38,7 @@ class AdminController extends Controller
         $bride_answers = Answer::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('upload_user_type', 1)->get();
         $questions = Question::WHERE('upload_user_ceremony_id', Auth::User()->ceremonies_id)->WHERE('deleted_at', null)->paginate(5);
 
-        return view('admin', compact('users', 'uploads_photos', 'seating_img', 'ceremony_info', 'groom_answers', 'bride_answers', 'questions'));
+        return view('admin', compact('uploads_photos', 'seating_img', 'ceremony_info', 'groom_answers', 'bride_answers', 'questions'));
     }
 
     /**
@@ -143,10 +142,50 @@ class AdminController extends Controller
 
 
     public function getSearchedGuest(getSearchedGuestRequest $request){
-        $data = $request->only(['id', 'kana']);
-        $guests = User::WHERE('kana', $data['kana'])->WHERE('ceremonies_id', $data['id'])->get();
         
+        $data = $request->all();
+
+        if(isset($data['kana'])) {
+            $guests = User::WHERE('kana', $data['kana'])->WHERE('ceremonies_id', $data['id'])->get();
+        } 
+        if(isset($data['gender']) || isset($data['whichSide']) || isset($data['relationship'])) {
+            if(isset($data['gender']) && isset($data['whichSide']) && isset($data['relationship'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('gender', $data['gender'])
+                ->WHERE('is_bride_side', $data['whichSide'])
+                ->WHERE('relationship', $data['relationship'])
+                ->get();
+            } elseif (isset($data['gender']) && isset($data['whichSide'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('gender', $data['gender'])
+                ->WHERE('is_bride_side', $data['whichSide'])
+                ->get();
+            } elseif (isset($data['whichSide']) && isset($data['relationship'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('is_bride_side', $data['whichSide'])
+                ->WHERE('relationship', $data['relationship'])
+                ->get();
+            } elseif (isset($data['gender']) && isset($data['relationship'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('gender', $data['gender'])
+                ->WHERE('relationship', $data['relationship'])
+                ->get();
+            } elseif (isset($data['gender'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('gender', $data['gender'])
+                ->get();
+            } elseif (isset($data['whichSide'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('is_bride_side', $data['whichSide'])
+                ->get();
+            } elseif (isset($data['relationship'])) {
+                $guests = User::WHERE('ceremonies_id', Auth::User()->ceremonies_id)
+                ->WHERE('relationship', $data['relationship'])
+                ->get();
+            }     
+        }
         return response()->json($guests);
+        
     }
 
     /**

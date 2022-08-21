@@ -23,6 +23,7 @@ mix
     .js('resources/js/googleMapsApi.js', 'public/js')
     .js('resources/js/deletePhotosInAlbumPage.js', 'public/js')
     .js('resources/js/popup_confirmation.js', 'public/js')
+    .js('resources/js/addInput.js', 'public/js')
     .sourceMaps()
     .autoload( {
         "jquery": [ '$', 'window.jQuery' ],

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\UploadPhotoController;
 use App\Http\Controllers\Auth\QrCheckInController;
+use App\Http\Controllers\MasterController;
 use App\Models\UploadPhoto;
 use App\Models\Ceremony;
 use Illuminate\Http\Request;
@@ -21,13 +22,21 @@ use Illuminate\Support\Facades\Auth;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// TODO:写真やコメントの混合を防ぐためルーティングで/{ceremonies_id}/を入れる必要がある⇒？？？
 
 Route::get('/', [GuestController::class, 'index'])->middleware(['auth'])->name('dashboard');
 Route::get('/dashboard', [GuestController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 //当日出席関連
 Route::post('/qr_login', 'Auth\\QrCheckInController@login');
+
+Route::group(
+    [
+        'prefix' => '/master',
+        'middleware' => ['auth', 'can:master']
+    ],function(){
+        Route::get('/index', [MasterController::class, 'index'])->name('master.index');
+    }
+);
 
 Route::group(
     [

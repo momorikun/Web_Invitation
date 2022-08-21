@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Illuminate\Support\Str;
 
 //TODO:１つのアカウントで複数の挙式に参加できる設計にするべき
@@ -52,23 +52,14 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\Auth\RegisterRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request)
+    public function store(RegisterRequest $request)
     {        
         $user_categories_id = $request->user_categories_id ? 1 : 2;
-
-        $request->validate([
-            'name'                  => ['required', 'string', 'max:255'],
-            'kana'                  => ['required', 'string', 'min:2', 'max:255'],
-            'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'              => ['required', 'confirmed', Rules\Password::defaults()],
-            'password_confirmation' => ['required'],
-            'ceremonies_id'         => ['required', 'string', 'min:8', 'max:50'],
-        ]);
 
         if($user_categories_id === 1) {
             $exist = $this->duplicateCheck($request);

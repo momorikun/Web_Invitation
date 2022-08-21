@@ -25,8 +25,11 @@ class getSearchedGuestRequest extends FormRequest
     public function rules()
     {
         return [
-            'id'   => ['required', 'string', 'min:8', 'max:50'],
-            'kana' => ['required', 'string', 'min:2', 'max:255'],
+            'id'                    => ['string', 'min:8', 'max:50', 'nullable'],
+            'kana'                  => ['string', 'min:2', 'max:255', 'nullable'],
+            'gender'                => ['string', 'nullable'],
+            'whichSide'             => ['string', 'nullable'],
+            'relationship'          => ['string', 'nullable'],
         ];
     }
 }

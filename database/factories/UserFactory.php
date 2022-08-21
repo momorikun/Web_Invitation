@@ -16,9 +16,13 @@ class UserFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'kana' => 'test',
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'user_categories_id' => 2,
+            'ceremonies_id' => 'mori_no_ceremony',
+            'is_answered' => rand(0, 1),
             'remember_token' => Str::random(10),
         ];
     }
